@@ -27,16 +27,16 @@ public abstract class MinecraftMixin implements Runnable {
     }
 
 
-    @Inject(
+    @WrapOperation(
             method = "changeDimension",
             at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/World;remove(Lnet/minecraft/entity/Entity;)V"
+                    value = "FIELD",
+                    target = "Lnet/minecraft/entity/player/ClientPlayerEntity;dimensionId:I",
+                    opcode = Opcodes.PUTFIELD,
+                    ordinal = 1
             )
     )
-    private void setDimensionId(CallbackInfo ci) {
-        if (!((CheckDimension) this.player).slr_getNether()) {
-            this.player.dimensionId = 1;
-        }
+    private void setDimensionId(ClientPlayerEntity player, int value, Operation<Void> original) {
+        original.call(player, ((CheckDimension) player).slr_getNether() ? value : 1);
     }
 }
