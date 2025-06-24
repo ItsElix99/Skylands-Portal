@@ -23,7 +23,7 @@ public class InGameHudMixin extends DrawContext {
             )
     )
     private void renderSkylandsPortalOverlay(float red, float green, float blue, float alpha, Operation<Void> original) {
-        if (!((CheckDimension) this.minecraft.player).slr_getNether()) {
+        if (!((CheckDimension) this.minecraft.player).sp_getNether() && ((CheckDimension) this.minecraft.player).sp_getSkylandsPortalOverlay()) {
             original.call(0.39F, 0.71F, 0.98F, alpha);
         } else {
             original.call(red, green, blue, alpha);

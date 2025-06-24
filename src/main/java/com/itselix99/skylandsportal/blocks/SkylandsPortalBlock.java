@@ -7,7 +7,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.PortalForcer;
 import net.modificationstation.stationapi.api.block.CustomPortal;
@@ -106,38 +105,6 @@ public class SkylandsPortalBlock extends TemplateNetherPortalBlock implements Cu
                 world.setBlock(x, y, z, 0);
             }
         }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public boolean isSideVisible(BlockView blockView, int x, int y, int z, int side) {
-        if (blockView.getBlockId(x, y, z) == this.id) {
-            return false;
-        } else {
-            boolean var6 = blockView.getBlockId(x - 1, y, z) == this.id && blockView.getBlockId(x - 2, y, z) != this.id;
-            boolean var7 = blockView.getBlockId(x + 1, y, z) == this.id && blockView.getBlockId(x + 2, y, z) != this.id;
-            boolean var8 = blockView.getBlockId(x, y, z - 1) == this.id && blockView.getBlockId(x, y, z - 2) != this.id;
-            boolean var9 = blockView.getBlockId(x, y, z + 1) == this.id && blockView.getBlockId(x, y, z + 2) != this.id;
-            boolean var10 = var6 || var7;
-            boolean var11 = var8 || var9;
-            if (var10 && side == 4) {
-                return true;
-            } else if (var10 && side == 5) {
-                return true;
-            } else if (var11 && side == 2) {
-                return true;
-            } else {
-                return var11 && side == 3;
-            }
-        }
-    }
-
-    public int getDroppedItemCount(Random random) {
-        return 0;
-    }
-
-    @Environment(EnvType.CLIENT)
-    public int getRenderLayer() {
-        return 1;
     }
 
     @Environment(EnvType.CLIENT)

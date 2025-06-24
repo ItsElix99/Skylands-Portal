@@ -7,23 +7,26 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ClientPlayerEntity;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin implements Runnable {
-    @Shadow public ClientPlayerEntity player;
 
-    @Inject(
+    @WrapOperation(
             method = "changeDimension",
-            at = @At("HEAD")
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/entity/player/ClientPlayerEntity;dimensionId:I",
+                    opcode = Opcodes.GETFIELD,
+                    ordinal = 0
+            )
     )
-    private void setOverworldDimension(CallbackInfo ci) {
-        if (this.player.dimensionId == 1) {
-            this.player.dimensionId = 0;
+    private int redirectDimensionCheck(ClientPlayerEntity player, Operation<Integer> original) {
+        int dimensionId = original.call(player);
+        if (dimensionId == 1 && !((CheckDimension) player).sp_getNether()) {
+            return -1;
         }
+        return dimensionId;
     }
 
 
@@ -37,6 +40,6 @@ public abstract class MinecraftMixin implements Runnable {
             )
     )
     private void setDimensionId(ClientPlayerEntity player, int value, Operation<Void> original) {
-        original.call(player, ((CheckDimension) player).slr_getNether() ? value : 1);
+        original.call(player, ((CheckDimension) player).sp_getNether() ? value : 1);
     }
 }

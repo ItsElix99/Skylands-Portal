@@ -1,6 +1,8 @@
 package com.itselix99.skylandsportal.intefaces;
 
 public interface CheckDimension {
-    void slr_setNether(boolean nether);
-    boolean slr_getNether();
+    void sp_setNether(boolean nether);
+    boolean sp_getNether();
+    void sp_setSkylandsPortalOverlay(boolean bl);
+    boolean sp_getSkylandsPortalOverlay();
 }

@@ -10,18 +10,29 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements CheckDimension {
     @Unique private boolean nether;
+    @Unique private boolean skylandsPortalOverlay;
 
     public PlayerEntityMixin(World world) {
         super(world);
     }
 
     @Override
-    public void slr_setNether(boolean nether) {
+    public void sp_setNether(boolean nether) {
         this.nether = nether;
     }
 
     @Override
-    public boolean slr_getNether() {
+    public boolean sp_getNether() {
         return this.nether;
+    }
+
+    @Override
+    public void sp_setSkylandsPortalOverlay(boolean bl) {
+        this.skylandsPortalOverlay = bl;
+    }
+
+    @Override
+    public boolean sp_getSkylandsPortalOverlay() {
+        return this.skylandsPortalOverlay;
     }
 }

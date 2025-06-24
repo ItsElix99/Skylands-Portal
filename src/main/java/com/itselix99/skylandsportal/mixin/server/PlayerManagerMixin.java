@@ -8,20 +8,25 @@ import net.minecraft.server.PlayerManager;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerManager.class)
 public class PlayerManagerMixin {
 
-    @Inject(
+    @WrapOperation(
             method = "changePlayerDimension",
-            at = @At("HEAD")
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/entity/player/ServerPlayerEntity;dimensionId:I",
+                    opcode = Opcodes.GETFIELD,
+                    ordinal = 1
+            )
     )
-    private void setOverworldDimension(ServerPlayerEntity player, CallbackInfo ci) {
-        if (player.dimensionId == 1) {
-            player.dimensionId = 0;
+    private int redirectDimensionCheck(ServerPlayerEntity player, Operation<Integer> original) {
+        int dimensionId = original.call(player);
+        if (dimensionId == 1 && !((CheckDimension) player).sp_getNether()) {
+            return -1;
         }
+        return dimensionId;
     }
 
     @WrapOperation(
@@ -34,6 +39,6 @@ public class PlayerManagerMixin {
             )
     )
     private void setDimensionId(ServerPlayerEntity player, int value, Operation<Void> original) {
-        original.call(player, ((CheckDimension) player).slr_getNether() ? value : 1);
+        original.call(player, ((CheckDimension) player).sp_getNether() ? value : 1);
     }
 }

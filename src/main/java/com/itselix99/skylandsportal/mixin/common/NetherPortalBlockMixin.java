@@ -1,5 +1,6 @@
 package com.itselix99.skylandsportal.mixin.common;
 
+import com.itselix99.skylandsportal.SkylandsPortal;
 import com.itselix99.skylandsportal.intefaces.CheckDimension;
 import net.minecraft.block.Block;
 import net.minecraft.block.NetherPortalBlock;
@@ -23,7 +24,8 @@ public class NetherPortalBlockMixin extends TranslucentBlock {
     @Inject(method = "onEntityCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickPortalCooldown()V"))
     public void onEntityCollision(World world, int x, int y, int z, Entity entity, CallbackInfo ci) {
         if (entity instanceof PlayerEntity) {
-            ((CheckDimension) entity).slr_setNether(world.getBlockId(x, y, z) == Block.NETHER_PORTAL.id);
+            ((CheckDimension) entity).sp_setNether(world.getBlockId(x, y, z) == Block.NETHER_PORTAL.id);
+            ((CheckDimension) entity).sp_setSkylandsPortalOverlay(world.getBlockId(x, y, z) == SkylandsPortal.SKYLANDS_PORTAL.id);
         }
     }
 }
