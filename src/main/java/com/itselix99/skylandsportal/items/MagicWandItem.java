@@ -41,9 +41,15 @@ public class MagicWandItem extends TemplateFlintAndSteelItem {
 
         int var8 = world.getBlockId(x, y, z);
         int var9 = world.getBlockId(x, y - 1, z);
-        if (var8 == 0 && var9 == Block.GOLD_BLOCK.id) {
+        if (var9 != Block.GOLD_BLOCK.id) {
+           return false;
+        }
+
+        if (var8 == 0) {
             world.setBlock(x, y, z, SkylandsPortal.ALT_AIR.id);
         }
+
+        stack.damage(65, user);
         return true;
     }
 }
