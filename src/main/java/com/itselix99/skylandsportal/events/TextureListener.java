@@ -30,7 +30,7 @@ public class TextureListener {
         altAir = terrainAtlas.addTexture(Identifier.of(MOD_ID, "block/alt_air")).index;
 
         goldenStick = items.addTexture(Identifier.of(MOD_ID, "item/golden_stick")).index;
-        magicStick = items.addTexture(Identifier.of(MOD_ID, "item/magic_stick")).index;
+        magicStick = items.addTexture(Identifier.of(MOD_ID, "item/magic_wand")).index;
 
         SkylandsPortal.GOLDEN_STICK.setTextureId(goldenStick);
         SkylandsPortal.MAGIC_WAND.setTextureId(magicStick);
