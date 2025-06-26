@@ -21,7 +21,6 @@ public class TextureListener {
     public static int goldenStick;
     public static int magicStick;
 
-    @Environment(EnvType.CLIENT)
     @EventListener
     public void registerTextures(TextureRegisterEvent event) {
         ExpandableAtlas terrainAtlas = Atlases.getTerrain();

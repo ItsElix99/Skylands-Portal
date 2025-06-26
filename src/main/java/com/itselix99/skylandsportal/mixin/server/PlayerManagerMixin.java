@@ -23,8 +23,8 @@ public class PlayerManagerMixin {
     )
     private int redirectDimensionCheck(ServerPlayerEntity player, Operation<Integer> original) {
         int dimensionId = original.call(player);
-        if (dimensionId == 1 && !((CheckDimension) player).sp_getNether()) {
-            return -1;
+        if (!((CheckDimension) player).sp_getNether()) {
+            return 1;
         }
         return dimensionId;
     }

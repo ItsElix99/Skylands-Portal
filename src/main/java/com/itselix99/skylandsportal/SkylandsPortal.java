@@ -33,7 +33,7 @@ public class SkylandsPortal {
 
     @EventListener
     public void registerBlocks(BlockRegistryEvent event) {
-        SKYLANDS_PORTAL = new SkylandsPortalBlock(Identifier.of(MOD_ID, "skylands_portal"), TextureListener.skylandsPortal).setHardness(-1.0F).setResistance(6000000.0F).setSoundGroup(GLASS_SOUND_GROUP).setLuminance(0.75F).setTranslationKey(MOD_ID, "skylands_portal");
+        SKYLANDS_PORTAL = new SkylandsPortalBlock(Identifier.of(MOD_ID, "skylands_portal"), TextureListener.skylandsPortal).setSoundGroup(GLASS_SOUND_GROUP).setLuminance(0.75F).setTranslationKey(MOD_ID, "skylands_portal");
         ALT_AIR = new AltAirBlock(Identifier.of(MOD_ID, "alt_air"), TextureListener.altAir, Material.AIR).setTranslationKey(MOD_ID, "alt_air");
     }
 
