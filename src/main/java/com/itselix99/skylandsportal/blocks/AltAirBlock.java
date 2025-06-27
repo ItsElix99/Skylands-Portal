@@ -31,6 +31,14 @@ public class AltAirBlock extends TemplateBlock {
         return false;
     }
 
+    public void onPlaced(World world, int x, int y, int z){
+        world.scheduleBlockUpdate(x, y, z, this.id, 20);
+    }
+
+    public void onTick(World world, int x, int y, int z, Random random) {
+        world.setBlock(x, y, z, 0);
+    }
+
     public int getDroppedItemCount(Random random) {
         return 0;
     }

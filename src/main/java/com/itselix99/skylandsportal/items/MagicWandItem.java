@@ -1,6 +1,7 @@
 package com.itselix99.skylandsportal.items;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
+import com.itselix99.skylandsportal.blocks.SkylandsPortalBlock;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -41,11 +42,13 @@ public class MagicWandItem extends TemplateFlintAndSteelItem {
 
         int var8 = world.getBlockId(x, y, z);
         int var9 = world.getBlockId(x, y - 1, z);
-        if (var9 != Block.GOLD_BLOCK.id) {
-           return false;
+        boolean var10 = ((SkylandsPortalBlock) SkylandsPortal.SKYLANDS_PORTAL).isValidPortalFrame(world, x, y, z);
+
+        if (!var10) {
+            return false;
         }
 
-        if (var8 == 0) {
+        if (var8 == 0 && var9 == Block.GOLD_BLOCK.id) {
             world.setBlock(x, y, z, SkylandsPortal.ALT_AIR.id);
         }
 

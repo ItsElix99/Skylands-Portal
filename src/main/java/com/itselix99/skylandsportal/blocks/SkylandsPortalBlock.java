@@ -74,6 +74,52 @@ public class SkylandsPortalBlock extends TemplateNetherPortalBlock implements Cu
         }
     }
 
+    public boolean isValidPortalFrame(World world, int x, int y, int z) {
+        byte offsetX = 0;
+        byte offsetZ = 0;
+
+        if (world.getBlockId(x - 1, y, z) == Block.GOLD_BLOCK.id || world.getBlockId(x + 1, y, z) == Block.GOLD_BLOCK.id) {
+            offsetX = 1;
+        }
+
+        if (world.getBlockId(x, y, z - 1) == Block.GOLD_BLOCK.id || world.getBlockId(x, y, z + 1) == Block.GOLD_BLOCK.id) {
+            offsetZ = 1;
+        }
+
+        if (offsetX == offsetZ) {
+            return false;
+        }
+
+        if (world.getBlockId(x - offsetX, y, z - offsetZ) == 0) {
+            x -= offsetX;
+            z -= offsetZ;
+        }
+
+        for (int dx = -1; dx <= 2; dx++) {
+            for (int dy = -1; dy <= 3; dy++) {
+                boolean isFrame = dx == -1 || dx == 2 || dy == -1 || dy == 3;
+                int checkX = x + offsetX * dx;
+                int checkY = y + dy;
+                int checkZ = z + offsetZ * dx;
+
+                int blockId = world.getBlockId(checkX, checkY, checkZ);
+
+                if (isFrame) {
+                    if (blockId != Block.GOLD_BLOCK.id) {
+                        return false;
+                    }
+                } else {
+                    if (blockId != 0 && blockId != SkylandsPortal.ALT_AIR.id) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+
     public void neighborUpdate(World world, int x, int y, int z, int id) {
         byte var6 = 0;
         byte var7 = 1;
