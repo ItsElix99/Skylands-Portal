@@ -1,8 +1,6 @@
 package com.itselix99.skylandsportal.events;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.modificationstation.stationapi.api.client.event.texture.TextureRegisterEvent;
 import net.modificationstation.stationapi.api.client.texture.atlas.Atlases;
