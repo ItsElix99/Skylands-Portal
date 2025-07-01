@@ -10,3 +10,6 @@ The Golden Stick is crafted using 1 Stick and 1 Gold Ingot in a shapeless recipe
 The Magic Wand of Skylands is crafted using 2 Golden Sticks and 1 Diamond. It is the item used to light the Skylands portal, and it can only be used once.
 
 ![1000052511](https://github.com/user-attachments/assets/343cb7a6-d8e6-42e8-8985-f9aedbde944d)
+
+# Requirements
+* **StationAPI**
