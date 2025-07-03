@@ -1,6 +1,6 @@
 package com.itselix99.skylandsportal.mixin.client;
 
-import com.itselix99.skylandsportal.intefaces.CheckDimension;
+import com.itselix99.skylandsportal.interfaces.CheckDimension;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;

@@ -22,15 +22,15 @@
   "entrypoints": {
     "stationapi:event_bus": [
       "com.itselix99.skylandsportal.SkylandsPortal",
-      "com.itselix99.skylandsportal.events.SkylandsPortalListener"
+      "com.itselix99.skylandsportal.event.SkylandsPortalListener"
     ],
     "stationapi:event_bus_client": [
-      "com.itselix99.skylandsportal.events.TextureListener"
+      "com.itselix99.skylandsportal.event.TextureListener"
     ],
     "stationapi:event_bus_server": [
     ],
     "bhcreative:event_bus": [
-      "com.itselix99.skylandsportal.events.CreativeListener"
+      "com.itselix99.skylandsportal.event.CreativeListener"
     ]
   },
   "mixins": [

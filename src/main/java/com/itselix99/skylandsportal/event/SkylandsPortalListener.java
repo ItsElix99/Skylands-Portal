@@ -1,7 +1,7 @@
-package com.itselix99.skylandsportal.events;
+package com.itselix99.skylandsportal.event;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
-import com.itselix99.skylandsportal.blocks.SkylandsPortalBlock;
+import com.itselix99.skylandsportal.block.SkylandsPortalBlock;
 import com.itselix99.skylandsportal.entity.SkylandsLightningEntity;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.block.Block;

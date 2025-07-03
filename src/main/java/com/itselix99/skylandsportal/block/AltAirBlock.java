@@ -1,6 +1,6 @@
-package com.itselix99.skylandsportal.blocks;
+package com.itselix99.skylandsportal.block;
 
-import com.itselix99.skylandsportal.events.TextureListener;
+import com.itselix99.skylandsportal.event.TextureListener;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;

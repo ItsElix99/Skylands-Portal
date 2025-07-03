@@ -1,7 +1,7 @@
-package com.itselix99.skylandsportal.blocks;
+package com.itselix99.skylandsportal.block;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
-import com.itselix99.skylandsportal.events.TextureListener;
+import com.itselix99.skylandsportal.event.TextureListener;
 import com.itselix99.skylandsportal.portal.SkylandsPortalForcer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

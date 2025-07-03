@@ -1,6 +1,6 @@
 package com.itselix99.skylandsportal.mixin.common;
 
-import com.itselix99.skylandsportal.intefaces.CheckDimension;
+import com.itselix99.skylandsportal.interfaces.CheckDimension;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;

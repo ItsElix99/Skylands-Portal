@@ -1,4 +1,4 @@
-package com.itselix99.skylandsportal.items;
+package com.itselix99.skylandsportal.item;
 
 import net.modificationstation.stationapi.api.template.item.TemplateItem;
 import net.modificationstation.stationapi.api.util.Identifier;

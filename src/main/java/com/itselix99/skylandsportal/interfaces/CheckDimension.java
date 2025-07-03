@@ -1,4 +1,4 @@
-package com.itselix99.skylandsportal.intefaces;
+package com.itselix99.skylandsportal.interfaces;
 
 public interface CheckDimension {
     void sp_setNether(boolean nether);

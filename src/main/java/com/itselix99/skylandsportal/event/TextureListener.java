@@ -1,4 +1,4 @@
-package com.itselix99.skylandsportal.events;
+package com.itselix99.skylandsportal.event;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
 import net.mine_diver.unsafeevents.listener.EventListener;
@@ -10,10 +10,9 @@ import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.Namespace;
 import net.modificationstation.stationapi.api.util.Null;
 
-public class TextureListener {
-    @Entrypoint.Namespace
-    public static Namespace MOD_ID = Null.get();
+import static com.itselix99.skylandsportal.SkylandsPortal.NAMESPACE;
 
+public class TextureListener {
     public static int skylandsPortal;
     public static int altAir;
     public static int goldenStick;
@@ -24,11 +23,11 @@ public class TextureListener {
         ExpandableAtlas terrainAtlas = Atlases.getTerrain();
         ExpandableAtlas items = Atlases.getGuiItems();
 
-        skylandsPortal = terrainAtlas.addTexture(Identifier.of(MOD_ID, "block/skylands_portal")).index;
-        altAir = terrainAtlas.addTexture(Identifier.of(MOD_ID, "block/alt_air")).index;
+        skylandsPortal = terrainAtlas.addTexture(NAMESPACE.id("block/skylands_portal")).index;
+        altAir = terrainAtlas.addTexture(NAMESPACE.id("block/alt_air")).index;
 
-        goldenStick = items.addTexture(Identifier.of(MOD_ID, "item/golden_stick")).index;
-        magicStick = items.addTexture(Identifier.of(MOD_ID, "item/magic_wand")).index;
+        goldenStick = items.addTexture(NAMESPACE.id("item/golden_stick")).index;
+        magicStick = items.addTexture(NAMESPACE.id("item/magic_wand")).index;
 
         SkylandsPortal.GOLDEN_STICK.setTextureId(goldenStick);
         SkylandsPortal.MAGIC_WAND.setTextureId(magicStick);

@@ -1,7 +1,7 @@
 package com.itselix99.skylandsportal.mixin.common;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
-import com.itselix99.skylandsportal.intefaces.CheckDimension;
+import com.itselix99.skylandsportal.interfaces.CheckDimension;
 import net.minecraft.block.Block;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.TranslucentBlock;

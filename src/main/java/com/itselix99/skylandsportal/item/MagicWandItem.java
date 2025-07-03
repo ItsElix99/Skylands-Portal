@@ -1,7 +1,7 @@
-package com.itselix99.skylandsportal.items;
+package com.itselix99.skylandsportal.item;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
-import com.itselix99.skylandsportal.blocks.SkylandsPortalBlock;
+import com.itselix99.skylandsportal.block.SkylandsPortalBlock;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
