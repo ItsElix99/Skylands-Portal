@@ -57,38 +57,4 @@ public abstract class MinecraftMixin implements Runnable {
     private void setDimensionId(ClientPlayerEntity player, int value, Operation<Void> original) {
         original.call(player, ((CheckDimension) player).sp_getNether() ? value : 1);
     }
-
-    @Inject(
-            method = "changeDimension",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/dimension/PortalForcer;moveToPortal(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;)V",
-                    shift = At.Shift.AFTER
-            )
-    )
-    private void testing(CallbackInfo ci) {
-        if (this.player.dimensionId == 1) {
-            double var1 = this.player.x * 8.0F;
-            double var3 = this.player.z * 8.0F;
-            Vec3i var11 = this.world.getSpawnPos();
-            var1 = (double)var11.x + 0.5D;
-            this.player.y = (double)(var11.y + 1);
-            var3 = (double)var11.z + 0.5D;
-            while(this.player.y > 0.0D) {
-                this.player.setPosition(var1, this.player.y, var3);
-                if (this.world.getEntityCollisions(this.player, this.player.boundingBox).isEmpty()) {
-                    break;
-                }
-                ++this.player.y;
-            }
-            this.player.velocityX = this.player.velocityY = this.player.velocityZ = 0.0D;
-            this.player.pitch = 0.0F;
-            this.interactionManager.preparePlayer(this.player);
-            if (this.player.isAlive()) {
-                this.world.updateEntity(this.player, false);
-            }
-        }
-
-        ((SkylandsPortalBlock) SkylandsPortal.SKYLANDS_PORTAL).getTravelAgent(this.player).moveToPortal(this.world, this.player);
-    }
 }
