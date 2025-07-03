@@ -11,5 +11,10 @@ The Magic Wand of Skylands is crafted using 2 Golden Sticks and 1 Diamond. It is
 
 ![1000052511](https://github.com/user-attachments/assets/343cb7a6-d8e6-42e8-8985-f9aedbde944d)
 
+Now, use the Magic Wand of Skylands to light the portal and start traveling to Skylands!
+
+![1000054829](https://github.com/user-attachments/assets/61938914-c2d8-44de-ac5f-fa7627fbd746)
+
+
 # Requirements
 * **StationAPI**
