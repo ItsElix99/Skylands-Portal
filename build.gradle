@@ -3,19 +3,31 @@
 //file:noinspection ForeignDelegate
 plugins {
     id 'maven-publish'
-    id 'fabric-loom' version '1.10.5'
-    id 'babric-loom-extension' version '1.10.1'
+    id 'fabric-loom' version '1.15.3'
+    id 'babric-loom-extension' version '1.15.3'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+version = property("mod_version")
+group = property("maven_group")
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
+base {
+    archivesName = project.archives_base_name
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withSourcesJar()
+}
 
 loom {
-	//accessWidenerPath = file("src/main/resources/template.accesswidener")
+    if (project.hasProperty("accesswidener_name") && project.accesswidener_name.length() > 0) {
+        accessWidenerPath = file("src/main/resources/${project.accesswidener_name}.accesswidener")
+    }
+    mixin {
+        useLegacyMixinAp = false
+    }
 }
 
 repositories {
@@ -80,7 +92,9 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-slf4j18-impl:2.17.2"
     implementation "me.carleslc:Simple-Yaml:1.8.4"
 
-    modImplementation "net.modificationstation:StationAPI:${project.stapi_version}"
+    modImplementation ("net.modificationstation:StationAPI:${project.stapi_version}") {
+        exclude group: "babric", module: "fabric-loader"
+    }
 
     modImplementation("maven.modrinth:aether-stapi:${project.aether_version}-fabric,b1.7.3") {
         transitive false
@@ -90,7 +104,7 @@ dependencies {
         transitive false
     }
 
-    modImplementation("net.glasslauncher.mods:ModMenu:${project.modmenu_version}") {
+    modImplementation("maven.modrinth:modmenu-babric:${project.modmenu_version}") {
         transitive false
     }
 
@@ -108,10 +122,6 @@ dependencies {
 	
     modImplementation("maven.modrinth:retrocommands:${project.retrocommands_version}-fabric,b1.7.3") {
 	    transitive false
-    }
-
-    modImplementation("net.danygames2014:spawneggs:${project.spawneggs_version}") {
-        transitive false
     }
 
     modImplementation("maven.modrinth:bh-creative:${project.bhcreative_version}-fabric,b1.7.3") {
@@ -143,13 +153,19 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 17
 }
 
-java {
-    withSourcesJar()
+// Disables the generation of the .module file
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
+
+// Gradle 9 fails the build if there are no tests, but we are using the test package for a test mod
+tasks.withType(Test).configureEach {
+    failOnNoDiscoveredTests = false
 }
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_" + base.archivesName.get() }
     }
 }
 
@@ -181,10 +197,10 @@ publishing {
 		}
 	}
 
-	publications {
-		mavenJava(MavenPublication) {
-			artifactId = project.archivesBaseName
-			from components.java
-		}
-	}
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = base.archivesName.get()
+            from components.java
+        }
+    }
 }
