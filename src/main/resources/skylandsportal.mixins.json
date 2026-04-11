@@ -9,11 +9,9 @@
     "common.SkylandsDimensionMixin"
   ],
   "server": [
-    "server.PlayerManagerMixin"
   ],
   "client": [
     "client.InGameHudMixin",
-    "client.MinecraftMixin",
     "client.WorldRendererMixin"
   ],
   "injectors": {

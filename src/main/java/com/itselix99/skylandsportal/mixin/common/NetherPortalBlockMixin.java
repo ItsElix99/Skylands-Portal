@@ -1,11 +1,9 @@
 package com.itselix99.skylandsportal.mixin.common;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
-import com.itselix99.skylandsportal.interfaces.CheckDimension;
+import com.itselix99.skylandsportal.interfaces.SPCheckDimension;
 import net.minecraft.block.Block;
 import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.block.TranslucentBlock;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
@@ -15,17 +13,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetherPortalBlock.class)
-public class NetherPortalBlockMixin extends TranslucentBlock {
-
-    public NetherPortalBlockMixin(int id, int textureId, Material material, boolean transparent) {
-        super(id, textureId, material, transparent);
-    }
+public class NetherPortalBlockMixin {
 
     @Inject(method = "onEntityCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickPortalCooldown()V"))
-    public void onEntityCollision(World world, int x, int y, int z, Entity entity, CallbackInfo ci) {
+    public void sp_onEntityCollision(World world, int x, int y, int z, Entity entity, CallbackInfo ci) {
         if (entity instanceof PlayerEntity) {
-            ((CheckDimension) entity).sp_setNether(world.getBlockId(x, y, z) == Block.NETHER_PORTAL.id);
-            ((CheckDimension) entity).sp_setSkylandsPortalOverlay(world.getBlockId(x, y, z) == SkylandsPortal.SKYLANDS_PORTAL.id);
+            ((SPCheckDimension) entity).sp_setNether(world.getBlockId(x, y, z) == Block.NETHER_PORTAL.id);
+            ((SPCheckDimension) entity).sp_setSkylandsPortalOverlay(world.getBlockId(x, y, z) == SkylandsPortal.SKYLANDS_PORTAL.id);
         }
     }
 }

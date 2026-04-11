@@ -1,17 +1,16 @@
 package com.itselix99.skylandsportal.mixin.client;
 
-import com.itselix99.skylandsportal.interfaces.CheckDimension;
+import com.itselix99.skylandsportal.interfaces.SPCheckDimension;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(InGameHud.class)
-public class InGameHudMixin extends DrawContext {
+public class InGameHudMixin {
     @Shadow private Minecraft minecraft;
 
     @WrapOperation(
@@ -22,8 +21,8 @@ public class InGameHudMixin extends DrawContext {
                     ordinal = 0
             )
     )
-    private void renderSkylandsPortalOverlay(float red, float green, float blue, float alpha, Operation<Void> original) {
-        if (!((CheckDimension) this.minecraft.player).sp_getNether() && ((CheckDimension) this.minecraft.player).sp_getSkylandsPortalOverlay()) {
+    private void sp_renderSkylandsPortalOverlay(float red, float green, float blue, float alpha, Operation<Void> original) {
+        if (!((SPCheckDimension) this.minecraft.player).sp_isNether() && ((SPCheckDimension) this.minecraft.player).sp_getSkylandsPortalOverlay()) {
             original.call(0.39F, 0.71F, 0.98F, alpha);
         } else {
             original.call(red, green, blue, alpha);

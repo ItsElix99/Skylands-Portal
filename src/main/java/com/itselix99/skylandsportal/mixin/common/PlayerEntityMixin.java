@@ -1,20 +1,14 @@
 package com.itselix99.skylandsportal.mixin.common;
 
-import com.itselix99.skylandsportal.interfaces.CheckDimension;
-import net.minecraft.entity.LivingEntity;
+import com.itselix99.skylandsportal.interfaces.SPCheckDimension;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin extends LivingEntity implements CheckDimension {
+public class PlayerEntityMixin implements SPCheckDimension {
     @Unique private boolean nether;
     @Unique private boolean skylandsPortalOverlay;
-
-    public PlayerEntityMixin(World world) {
-        super(world);
-    }
 
     @Override
     public void sp_setNether(boolean nether) {
@@ -22,7 +16,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements CheckDim
     }
 
     @Override
-    public boolean sp_getNether() {
+    public boolean sp_isNether() {
         return this.nether;
     }
 
