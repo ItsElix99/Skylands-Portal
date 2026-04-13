@@ -2,7 +2,6 @@ package com.itselix99.skylandsportal.mixin.common;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
 import com.itselix99.skylandsportal.interfaces.SPCheckDimension;
-import net.minecraft.block.Block;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,8 +17,9 @@ public class NetherPortalBlockMixin {
     @Inject(method = "onEntityCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickPortalCooldown()V"))
     public void sp_onEntityCollision(World world, int x, int y, int z, Entity entity, CallbackInfo ci) {
         if (entity instanceof PlayerEntity) {
-            ((SPCheckDimension) entity).sp_setNether(world.getBlockId(x, y, z) == Block.NETHER_PORTAL.id);
-            ((SPCheckDimension) entity).sp_setSkylandsPortalOverlay(world.getBlockId(x, y, z) == SkylandsPortal.SKYLANDS_PORTAL.id);
+            int blockId = world.getBlockId(x, y, z);
+
+            ((SPCheckDimension) entity).sp_setBlockPortalId(blockId == SkylandsPortal.SKYLANDS_PORTAL.id ? SkylandsPortal.SKYLANDS_PORTAL.id : -1);
         }
     }
 }

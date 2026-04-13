@@ -7,26 +7,15 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixin implements SPCheckDimension {
-    @Unique private boolean nether;
-    @Unique private boolean skylandsPortalOverlay;
+    @Unique private int blockPortalId = -1;
 
     @Override
-    public void sp_setNether(boolean nether) {
-        this.nether = nether;
+    public void sp_setBlockPortalId(int id) {
+        this.blockPortalId = id;
     }
 
     @Override
-    public boolean sp_isNether() {
-        return this.nether;
-    }
-
-    @Override
-    public void sp_setSkylandsPortalOverlay(boolean bl) {
-        this.skylandsPortalOverlay = bl;
-    }
-
-    @Override
-    public boolean sp_getSkylandsPortalOverlay() {
-        return this.skylandsPortalOverlay;
+    public int sp_getBlockPortalId() {
+        return this.blockPortalId;
     }
 }

@@ -7,6 +7,7 @@ import net.modificationstation.stationapi.api.client.texture.atlas.Atlases;
 import net.modificationstation.stationapi.api.client.texture.atlas.ExpandableAtlas;
 
 import static com.itselix99.skylandsportal.SkylandsPortal.NAMESPACE;
+import static com.itselix99.skylandsportal.SkylandsPortal.SKYLANDS_PORTAL;
 
 public class TextureListener {
     public static int skylandsPortal;
@@ -25,6 +26,7 @@ public class TextureListener {
         goldenStick = items.addTexture(NAMESPACE.id("item/golden_stick")).index;
         magicStick = items.addTexture(NAMESPACE.id("item/magic_wand")).index;
 
+        SKYLANDS_PORTAL.textureId = skylandsPortal;
         SkylandsPortal.GOLDEN_STICK.setTextureId(goldenStick);
         SkylandsPortal.MAGIC_WAND.setTextureId(magicStick);
     }

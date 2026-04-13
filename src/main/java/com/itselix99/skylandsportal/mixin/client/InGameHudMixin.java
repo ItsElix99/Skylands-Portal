@@ -1,31 +1,72 @@
 package com.itselix99.skylandsportal.mixin.client;
 
+import com.itselix99.skylandsportal.SkylandsPortal;
 import com.itselix99.skylandsportal.interfaces.SPCheckDimension;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.modificationstation.stationapi.api.client.texture.Sprite;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(InGameHud.class)
+@Mixin(value = InGameHud.class, priority = 1100)
 public class InGameHudMixin {
     @Shadow private Minecraft minecraft;
 
-    @WrapOperation(
+    @ModifyVariable(
             method = "renderPortalOverlay",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lorg/lwjgl/opengl/GL11;glColor4f(FFFF)V",
-                    ordinal = 0
-            )
+            at = @At("STORE"),
+            index = 4
     )
-    private void sp_renderSkylandsPortalOverlay(float red, float green, float blue, float alpha, Operation<Void> original) {
-        if (!((SPCheckDimension) this.minecraft.player).sp_isNether() && ((SPCheckDimension) this.minecraft.player).sp_getSkylandsPortalOverlay()) {
-            original.call(0.39F, 0.71F, 0.98F, alpha);
+    private float sp_skylandsPortalTextureMinU(float original) {
+        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+            Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
+            return sprite.getMinU();
         } else {
-            original.call(red, green, blue, alpha);
+            return original;
+        }
+    }
+
+    @ModifyVariable(
+            method = "renderPortalOverlay",
+            at = @At("STORE"),
+            index = 5
+    )
+    private float sp_skylandsPortalTextureMinV(float original) {
+        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+            Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
+            return sprite.getMinV();
+        } else {
+            return original;
+        }
+    }
+
+    @ModifyVariable(
+            method = "renderPortalOverlay",
+            at = @At("STORE"),
+            index = 6
+    )
+    private float sp_skylandsPortalTextureMaxU(float original) {
+        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+            Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
+            return sprite.getMaxU();
+        } else {
+            return original;
+        }
+    }
+
+    @ModifyVariable(
+            method = "renderPortalOverlay",
+            at = @At("STORE"),
+            index = 7
+    )
+    private float sp_skylandsPortalTextureMaxV(float original) {
+        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+            Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
+            return sprite.getMaxV();
+        } else {
+            return original;
         }
     }
 }
