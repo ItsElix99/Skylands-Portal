@@ -15,13 +15,6 @@ public class SkylandsPortalForcer extends PortalForcer {
     public SkylandsPortalForcer() {
     }
 
-    public void moveToPortal(World world, Entity entity) {
-        if (!this.teleportToValidPortal(world, entity)) {
-            this.createPortal(world, entity);
-            this.teleportToValidPortal(world, entity);
-        }
-    }
-
     public boolean teleportToValidPortal(World world, Entity entity) {
         short var3 = 128;
         double var4 = -1.0;
@@ -139,7 +132,7 @@ public class SkylandsPortalForcer extends PortalForcer {
                                         var27 = var14 + (var25 - 1) * var22 + var24 * var23;
                                         var28 = var20 + var26;
                                         int var29 = var17 + (var25 - 1) * var23 - var24 * var22;
-                                        if (var26 < 0 && !this.blockIsGood(world.getBlockId(var27, var28, var29), world.getBlockMeta(var27, var28, var29)) || var26 >= 0 && !world.isAir(var27, var28, var29)) {
+                                        if (var26 < 0 && !this.blockIsGood(world.getBlockId(var27, var28, var29))) {
                                             continue label296;
                                         }
                                     }
@@ -184,7 +177,7 @@ public class SkylandsPortalForcer extends PortalForcer {
                                         var26 = var14 + (var24 - 1) * var22;
                                         var27 = var20 + var25;
                                         var28 = var17 + (var24 - 1) * var23;
-                                        if (var25 < 0 && !this.blockIsGood(world.getBlockId(var26, var27, var28), world.getBlockMeta(var26, var27, var28)) || var25 >= 0 && !world.isAir(var26, var27, var28)) {
+                                        if (var25 < 0 && !this.blockIsGood(world.getBlockId(var26, var27, var28))) {
                                             continue label234;
                                         }
                                     }
@@ -269,13 +262,11 @@ public class SkylandsPortalForcer extends PortalForcer {
         return true;
     }
 
-    public boolean blockIsGood(int block, int meta) {
+    public boolean blockIsGood(int block) {
         if (block == 0) {
             return false;
-        } else if (!Block.BLOCKS[block].material.isSolid()) {
-            return false;
-        } else {
-            return meta != 0;
         }
+
+        return Block.BLOCKS[block].isFullCube() && Block.BLOCKS[block].isOpaque();
     }
 }
