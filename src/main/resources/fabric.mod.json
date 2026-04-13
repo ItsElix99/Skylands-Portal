@@ -29,6 +29,9 @@
     ],
     "stationapi:event_bus_server": [
     ],
+    "gcapi3": [
+      "com.itselix99.skylandsportal.config.SkylandsPortalConfig"
+    ],
     "bhcreative:event_bus": [
       "com.itselix99.skylandsportal.event.CreativeListener"
     ]
