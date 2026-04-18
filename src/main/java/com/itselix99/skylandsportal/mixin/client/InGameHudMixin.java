@@ -20,7 +20,7 @@ public class InGameHudMixin {
             index = 4
     )
     private float sp_skylandsPortalTextureMinU(float original) {
-        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+        if (((SPCheckDimension) this.minecraft.player).sp_isInSkylandsPortalBlock()) {
             Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
             return sprite.getMinU();
         } else {
@@ -34,7 +34,7 @@ public class InGameHudMixin {
             index = 5
     )
     private float sp_skylandsPortalTextureMinV(float original) {
-        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+        if (((SPCheckDimension) this.minecraft.player).sp_isInSkylandsPortalBlock()) {
             Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
             return sprite.getMinV();
         } else {
@@ -48,7 +48,7 @@ public class InGameHudMixin {
             index = 6
     )
     private float sp_skylandsPortalTextureMaxU(float original) {
-        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+        if (((SPCheckDimension) this.minecraft.player).sp_isInSkylandsPortalBlock()) {
             Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
             return sprite.getMaxU();
         } else {
@@ -62,7 +62,7 @@ public class InGameHudMixin {
             index = 7
     )
     private float sp_skylandsPortalTextureMaxV(float original) {
-        if (((SPCheckDimension) this.minecraft.player).sp_getBlockPortalId() == SkylandsPortal.SKYLANDS_PORTAL.id) {
+        if (((SPCheckDimension) this.minecraft.player).sp_isInSkylandsPortalBlock()) {
             Sprite sprite = SkylandsPortal.SKYLANDS_PORTAL.getAtlas().getTexture(SkylandsPortal.SKYLANDS_PORTAL.textureId).getSprite();
             return sprite.getMaxV();
         } else {

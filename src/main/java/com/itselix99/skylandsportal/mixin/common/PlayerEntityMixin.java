@@ -7,15 +7,15 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixin implements SPCheckDimension {
-    @Unique private int blockPortalId = -1;
+    @Unique private boolean inSkylandsPortalBlock = false;
 
     @Override
-    public void sp_setBlockPortalId(int id) {
-        this.blockPortalId = id;
+    public void sp_setInSkylandsPortalBlock(boolean bl) {
+        this.inSkylandsPortalBlock = bl;
     }
 
     @Override
-    public int sp_getBlockPortalId() {
-        return this.blockPortalId;
+    public boolean sp_isInSkylandsPortalBlock() {
+        return this.inSkylandsPortalBlock;
     }
 }

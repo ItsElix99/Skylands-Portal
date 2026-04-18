@@ -4,7 +4,7 @@
   "package": "com.itselix99.skylandsportal.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "common.NetherPortalBlockMixin",
+    "common.EntityMixin",
     "common.PlayerEntityMixin",
     "common.SkylandsDimensionMixin"
   ],

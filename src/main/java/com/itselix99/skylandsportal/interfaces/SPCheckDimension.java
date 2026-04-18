@@ -1,6 +1,6 @@
 package com.itselix99.skylandsportal.interfaces;
 
 public interface SPCheckDimension {
-    void sp_setBlockPortalId(int id);
-    int sp_getBlockPortalId();
+    void sp_setInSkylandsPortalBlock(boolean bl);
+    boolean sp_isInSkylandsPortalBlock();
 }
