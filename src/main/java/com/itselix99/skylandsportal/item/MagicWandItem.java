@@ -40,19 +40,22 @@ public class MagicWandItem extends TemplateFlintAndSteelItem {
             ++x;
         }
 
-        int var8 = world.getBlockId(x, y, z);
-        int var9 = world.getBlockId(x, y - 1, z);
-        boolean var10 = ((SkylandsPortalBlock) SkylandsPortal.SKYLANDS_PORTAL).isValidPortalFrame(world, x, y, z);
+        if (user.dimensionId != -1) {
+            int var8 = world.getBlockId(x, y, z);
+            int var9 = world.getBlockId(x, y - 1, z);
+            boolean var10 = ((SkylandsPortalBlock) SkylandsPortal.SKYLANDS_PORTAL).isValidPortalFrame(world, x, y, z);
 
-        if (!var10) {
-            return false;
+            if (!var10) {
+                return false;
+            }
+
+            if (var8 == 0 && var9 == Block.GOLD_BLOCK.id) {
+                world.setBlock(x, y, z, SkylandsPortal.ALT_AIR.id);
+            }
+
+            stack.damage(65, user);
         }
 
-        if (var8 == 0 && var9 == Block.GOLD_BLOCK.id) {
-            world.setBlock(x, y, z, SkylandsPortal.ALT_AIR.id);
-        }
-
-        stack.damage(65, user);
         return true;
     }
 }
