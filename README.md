@@ -14,7 +14,7 @@ The Magic Wand of Skylands is crafted using 2 Golden Sticks and 1 Diamond. It is
 ## Requirements
 ### Babric
 * [StationAPI](https://modrinth.com/mod/stationapi)
-* [Glass Config](https://modrinth.com/mod/glass-config-api)
+* [Glass Config API](https://modrinth.com/mod/glass-config-api)
 * [Mod Menu Babric](https://modrinth.com/mod/modmenu-babric) (Optional, for in-game configuration)
 ### Risugami's ModLoader
 #### for b1.8.1
