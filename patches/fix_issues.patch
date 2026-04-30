@@ -1,0 +1,137 @@
+--- net/minecraft/src/SettingText.java
++++ net/minecraft/src/SettingText.java
+@@ -34,12 +34,4 @@
+ 	public String toString(String context) {
+ 		return this.get(context);
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((String)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/SettingBoolean.java
++++ net/minecraft/src/SettingBoolean.java
+@@ -38,12 +38,4 @@
+ 	public String toString(String context) {
+ 		return this.get(context).booleanValue() ? "true" : "false";
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Boolean)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/SettingMulti.java
++++ net/minecraft/src/SettingMulti.java
+@@ -96,12 +96,4 @@
+ 	public String toString(String context) {
+ 		return this.labelValues[this.get(context).intValue()];
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Integer)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/SettingKey.java
++++ net/minecraft/src/SettingKey.java
+@@ -61,12 +61,4 @@
+ 	public String toString(String context) {
+ 		return Keyboard.getKeyName(this.get(context).intValue());
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Integer)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/SettingInt.java
++++ net/minecraft/src/SettingInt.java
+@@ -66,12 +66,4 @@
+ 	public String toString(String context) {
+ 		return "" + this.get(context);
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Integer)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/ModLoader.java
++++ net/minecraft/src/ModLoader.java
+@@ -897,43 +897,7 @@
+ 	private static void readFromClassPath(File file) throws FileNotFoundException, IOException {
+ 		logger.finer("Adding mods from " + file.getCanonicalPath());
+ 		ClassLoader classloader = ModLoader.class.getClassLoader();
+-		if(file.isFile() && (file.getName().endsWith(".jar") || file.getName().endsWith(".zip"))) {
+-			logger.finer("Zip found.");
+-			FileInputStream var7 = new FileInputStream(file);
+-			ZipInputStream var9 = new ZipInputStream(var7);
+-			Object var10 = null;
+-
+-			while(true) {
+-				ZipEntry var11 = var9.getNextEntry();
+-				if(var11 == null) {
+-					var7.close();
+-					break;
+-				}
+-
+-				String s1 = var11.getName();
+-				if(!var11.isDirectory() && s1.startsWith("mod_") && s1.endsWith(".class")) {
+-					addMod(classloader, s1);
+-				}
+-			}
+-		} else if(file.isDirectory()) {
+-			Package package1 = ModLoader.class.getPackage();
+-			if(package1 != null) {
+-				String afile = package1.getName().replace('.', File.separatorChar);
+-				file = new File(file, afile);
+-			}
+-
+-			logger.finer("Directory found.");
+-			File[] var8 = file.listFiles();
+-			if(var8 != null) {
+-				for(int i = 0; i < var8.length; ++i) {
+-					String s2 = var8[i].getName();
+-					if(var8[i].isFile() && s2.startsWith("mod_") && s2.endsWith(".class")) {
+-						addMod(classloader, s2);
+-					}
+-				}
+-			}
+-		}
+-
++		addMod(classloader, "mod_SkylandsPortal");
+ 	}
+ 
+ 	private static void readFromModFolder(File file) throws IOException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+--- net/minecraft/src/SettingFloat.java
++++ net/minecraft/src/SettingFloat.java
+@@ -64,12 +64,4 @@
+ 	public String toString(String context) {
+ 		return "" + this.get(context);
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Float)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }

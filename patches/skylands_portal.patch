@@ -1,0 +1,988 @@
+--- /dev/null
++++ net/minecraft/src/mod_SkylandsPortal.java
+@@ -1,0 +1,148 @@
++package net.minecraft.src;
++
++import net.minecraft.client.Minecraft;
++import org.lwjgl.opengl.GL11;
++
++import javax.imageio.ImageIO;
++
++import static net.minecraft.src.Block.soundGlassFootstep;
++
++public class mod_SkylandsPortal extends BaseMod implements IInterceptBlockSet {
++    public static Block skylandsPortal;
++    public static Block altAir;
++
++    public static Item goldenStick;
++    public static Item magicWand;
++
++    public mod_SkylandsPortal() {
++        SkylandsPortalConfig.loadConfig();
++
++        if(isGuiAPILoaded()) {
++            new SkylandsPortalGuiAPI();
++        }
++
++        skylandsPortal = new BlockSkylandsPortal(SkylandsPortalConfig.skylandsPortalBlockId, ModLoader.addOverride("/terrain.png", "/skylandsportal/alt_air.png")).setHardness(-1.0F).setStepSound(soundGlassFootstep).setLightValue(12.0F / 16.0F).setBlockName("skylandsPortal");
++        altAir = new BlockAltAir(SkylandsPortalConfig.altAirBlockId, ModLoader.addOverride("/terrain.png", "/skylandsportal/alt_air.png"), Material.air);
++        ModLoader.RegisterBlock(skylandsPortal);
++        ModLoader.RegisterBlock(altAir);
++        ModLoader.AddName(skylandsPortal, "Skylands Portal");
++
++        goldenStick = new Item(SkylandsPortalConfig.goldenStickItemId).setIconIndex(ModLoader.addOverride("/gui/items.png", "/skylandsportal/golden_stick.png")).setItemName("goldenStick");
++        magicWand = new ItemMagicWand(SkylandsPortalConfig.magicWandItemId).setIconIndex(ModLoader.addOverride("/gui/items.png", "/skylandsportal/magic_wand.png")).setItemName("magicWand");
++        ModLoader.AddName(goldenStick, "Golden Stick");
++        ModLoader.AddName(magicWand, "Magic Wand of Skylands");
++
++        ModLoader.AddShapelessRecipe(new ItemStack(goldenStick, 1), new Object[]{Item.stick, Item.ingotGold});
++        ModLoader.AddRecipe(new ItemStack(magicWand, 1), new Object[]{"odo", "oso", "oso", 's', new ItemStack(goldenStick), 'd', new ItemStack(Item.diamond)});
++
++        try {
++            ModLoader.getMinecraftInstance().renderEngine.registerTextureFX(new TextureSkylandsPortalFX(skylandsPortal.blockIndexInTexture, 1, 0, ImageIO.read(Minecraft.class.getResource("/skylandsportal/skylands_portal.png")), 1));
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++
++        new DimensionSkylands();
++        SAPI.interceptAdd(this);
++        ModLoader.SetInGameHook(this, true, false);
++    }
++
++    public String Version() {
++        return "v1.1.1-b1.7.3";
++    }
++
++    public boolean OnTickInGame(Minecraft game) {
++        try {
++            float var16 = game.thePlayer.prevTimeInPortal + (game.thePlayer.timeInPortal - game.thePlayer.prevTimeInPortal) * ((Timer) ModLoader.getPrivateValue(Minecraft.class, ModLoader.getMinecraftInstance(), "T")).renderPartialTicks;
++            if (var16 > 0.0F && ((PlayerBaseSAPI) ((PlayerBaseSAPI) PlayerAPI.getPlayerBase(game.thePlayer, PlayerBaseSAPI.class))).portal == 1) {
++                GL11.glEnable(GL11.GL_BLEND);
++                ScaledResolution var19 = new ScaledResolution(game.gameSettings, game.displayWidth, game.displayHeight);
++                int var23 = var19.getScaledWidth();
++                int var22 = var19.getScaledHeight();
++                this.renderSkylandsPortalOverlay(game, var16, var23, var22);
++                GL11.glDisable(GL11.GL_BLEND);
++            }
++        } catch (Exception e) {
++            try {
++                float var16 = game.thePlayer.prevTimeInPortal + (game.thePlayer.timeInPortal - game.thePlayer.prevTimeInPortal) * ((Timer) ModLoader.getPrivateValue(Minecraft.class, ModLoader.getMinecraftInstance(), "timer")).renderPartialTicks;
++                if (var16 > 0.0F && ((PlayerBaseSAPI) ((PlayerBaseSAPI) PlayerAPI.getPlayerBase(game.thePlayer, PlayerBaseSAPI.class))).portal == 1) {
++                    GL11.glEnable(GL11.GL_BLEND);
++                    ScaledResolution var19 = new ScaledResolution(game.gameSettings, game.displayWidth, game.displayHeight);
++                    int var23 = var19.getScaledWidth();
++                    int var22 = var19.getScaledHeight();
++                    this.renderSkylandsPortalOverlay(game, var16, var23, var22);
++                    GL11.glDisable(GL11.GL_BLEND);
++                }
++            } catch (Exception e1) {
++                throw new RuntimeException(e1);
++            }
++        }
++
++        return true;
++    }
++
++    private void renderSkylandsPortalOverlay(Minecraft mc, float var1, int var2, int var3) {
++        if(var1 < 1.0F) {
++            var1 *= var1;
++            var1 *= var1;
++            var1 = var1 * 0.8F + 0.2F;
++        }
++
++        GL11.glDisable(GL11.GL_ALPHA_TEST);
++        GL11.glDisable(GL11.GL_DEPTH_TEST);
++        GL11.glDepthMask(false);
++        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
++        GL11.glColor4f(1.0F, 1.0F, 1.0F, var1);
++        GL11.glBindTexture(GL11.GL_TEXTURE_2D, mc.renderEngine.getTexture("/terrain.png"));
++        float var4 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture % 16) / 16.0F;
++        float var5 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture / 16) / 16.0F;
++        float var6 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture % 16 + 1) / 16.0F;
++        float var7 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture / 16 + 1) / 16.0F;
++        Tessellator var8 = Tessellator.instance;
++        var8.startDrawingQuads();
++        var8.addVertexWithUV(0.0D, (double)var3, -90.0D, (double)var4, (double)var7);
++        var8.addVertexWithUV((double)var2, (double)var3, -90.0D, (double)var6, (double)var7);
++        var8.addVertexWithUV((double)var2, 0.0D, -90.0D, (double)var6, (double)var5);
++        var8.addVertexWithUV(0.0D, 0.0D, -90.0D, (double)var4, (double)var5);
++        var8.draw();
++        GL11.glDepthMask(true);
++        GL11.glEnable(GL11.GL_DEPTH_TEST);
++        GL11.glEnable(GL11.GL_ALPHA_TEST);
++        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
++    }
++
++    public boolean canIntercept(World var1, Loc var2, int var3) {
++        if (var1.worldProvider.worldType != -1 && var3 == altAir.blockID) {
++            return true;
++        }
++
++        return false;
++    }
++
++    public int intercept(World var1, Loc var2, int var3) {
++        if (var3 == altAir.blockID) {
++            if (var1.getBlockId(var2.x(), var2.y() - 1, var2.z()) == Block.blockGold.blockID && ((BlockSkylandsPortal) skylandsPortal).tryToCreatePortal(var1, var2.x(), var2.y(), var2.z())) {
++                if (var1.worldProvider.worldType == 0 && var1.getSavedLightValue(EnumSkyBlock.Sky, var2.x(), var2.y(), var2.z()) > 12) {
++                    var1.entityJoinedWorld(new EntitySkylandsLightningBolt(var1, var2.x(), var2.y(), var2.z()));
++                }
++
++                return skylandsPortal.blockID;
++            }
++        }
++
++        return var3;
++    }
++
++    private static boolean isGuiAPILoaded() {
++        try {
++            Class.forName("GuiApiHelper");
++            return true;
++        } catch (ClassNotFoundException e) {
++            try {
++                Class.forName("net.minecraft.src.GuiApiHelper");
++                return true;
++            } catch (ClassNotFoundException e1) {
++                return false;
++            }
++        }
++    }
++}
+--- /dev/null
++++ net/minecraft/src/TeleporterSkylands.java
+@@ -1,0 +1,262 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class TeleporterSkylands extends Teleporter {
++    private final Random random = new Random();
++
++    public boolean func_4106_b(World var1, Entity var2) {
++        short var3 = 128;
++        double var4 = -1.0D;
++        int var6 = 0;
++        int var7 = 0;
++        int var8 = 0;
++        int var9 = MathHelper.floor_double(var2.posX);
++        int var10 = MathHelper.floor_double(var2.posZ);
++
++        double var18;
++        for(int var11 = var9 - var3; var11 <= var9 + var3; ++var11) {
++            double var12 = (double)var11 + 0.5D - var2.posX;
++
++            for(int var14 = var10 - var3; var14 <= var10 + var3; ++var14) {
++                double var15 = (double)var14 + 0.5D - var2.posZ;
++
++                for(int var17 = 128 - 1; var17 >= 0; --var17) {
++                    if(var1.getBlockId(var11, var17, var14) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                        while(var1.getBlockId(var11, var17 - 1, var14) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                            --var17;
++                        }
++
++                        var18 = (double)var17 + 0.5D - var2.posY;
++                        double var20 = var12 * var12 + var18 * var18 + var15 * var15;
++                        if(var4 < 0.0D || var20 < var4) {
++                            var4 = var20;
++                            var6 = var11;
++                            var7 = var17;
++                            var8 = var14;
++                        }
++                    }
++                }
++            }
++        }
++
++        if(var4 >= 0.0D) {
++            double var22 = (double)var6 + 0.5D;
++            double var16 = (double)var7 + 0.5D;
++            var18 = (double)var8 + 0.5D;
++            if(var1.getBlockId(var6 - 1, var7, var8) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var22 -= 0.5D;
++            }
++
++            if(var1.getBlockId(var6 + 1, var7, var8) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var22 += 0.5D;
++            }
++
++            if(var1.getBlockId(var6, var7, var8 - 1) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var18 -= 0.5D;
++            }
++
++            if(var1.getBlockId(var6, var7, var8 + 1) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var18 += 0.5D;
++            }
++
++            var2.setLocationAndAngles(var22, var16, var18, var2.rotationYaw, 0.0F);
++            var2.motionX = var2.motionY = var2.motionZ = 0.0D;
++            return true;
++        } else {
++            return false;
++        }
++    }
++
++    public boolean func_4108_c(World var1, Entity var2) {
++        byte var3 = 16;
++        double var4 = -1.0D;
++        int var6 = MathHelper.floor_double(var2.posX);
++        int var7 = MathHelper.floor_double(var2.posY);
++        int var8 = MathHelper.floor_double(var2.posZ);
++        int var9 = var6;
++        int var10 = var7;
++        int var11 = var8;
++        int var12 = 0;
++        int var13 = this.random.nextInt(4);
++
++        int var14;
++        double var15;
++        int var17;
++        double var18;
++        int var20;
++        int var21;
++        int var22;
++        int var23;
++        int var24;
++        int var25;
++        int var26;
++        int var27;
++        int var28;
++        double var32;
++        double var33;
++        for(var14 = var6 - var3; var14 <= var6 + var3; ++var14) {
++            var15 = (double)var14 + 0.5D - var2.posX;
++
++            for(var17 = var8 - var3; var17 <= var8 + var3; ++var17) {
++                var18 = (double)var17 + 0.5D - var2.posZ;
++
++                label296:
++                for(var20 = 128 - 1; var20 >= 0; --var20) {
++                    if(var1.isAirBlock(var14, var20, var17)) {
++                        while(var20 > 0 && var1.isAirBlock(var14, var20 - 1, var17)) {
++                            --var20;
++                        }
++
++                        for(var21 = var13; var21 < var13 + 4; ++var21) {
++                            var22 = var21 % 2;
++                            var23 = 1 - var22;
++                            if(var21 % 4 >= 2) {
++                                var22 = -var22;
++                                var23 = -var23;
++                            }
++
++                            for(var24 = 0; var24 < 3; ++var24) {
++                                for(var25 = 0; var25 < 4; ++var25) {
++                                    for(var26 = -1; var26 < 4; ++var26) {
++                                        var27 = var14 + (var25 - 1) * var22 + var24 * var23;
++                                        var28 = var20 + var26;
++                                        int var29 = var17 + (var25 - 1) * var23 - var24 * var22;
++                                        if(var26 < 0 && !this.blockIsGood(var1.getBlockId(var27, var28, var29))) {
++                                            continue label296;
++                                        }
++                                    }
++                                }
++                            }
++
++                            var32 = (double)var20 + 0.5D - var2.posY;
++                            var33 = var15 * var15 + var32 * var32 + var18 * var18;
++                            if(var4 < 0.0D || var33 < var4) {
++                                var4 = var33;
++                                var9 = var14;
++                                var10 = var20;
++                                var11 = var17;
++                                var12 = var21 % 4;
++                            }
++                        }
++                    }
++                }
++            }
++        }
++
++        if(var4 < 0.0D) {
++            for(var14 = var6 - var3; var14 <= var6 + var3; ++var14) {
++                var15 = (double)var14 + 0.5D - var2.posX;
++
++                for(var17 = var8 - var3; var17 <= var8 + var3; ++var17) {
++                    var18 = (double)var17 + 0.5D - var2.posZ;
++
++                    label234:
++                    for(var20 = 128 - 1; var20 >= 0; --var20) {
++                        if(var1.isAirBlock(var14, var20, var17)) {
++                            while(var20 > 0 && var1.isAirBlock(var14, var20 - 1, var17)) {
++                                --var20;
++                            }
++
++                            for(var21 = var13; var21 < var13 + 2; ++var21) {
++                                var22 = var21 % 2;
++                                var23 = 1 - var22;
++
++                                for(var24 = 0; var24 < 4; ++var24) {
++                                    for(var25 = -1; var25 < 4; ++var25) {
++                                        var26 = var14 + (var24 - 1) * var22;
++                                        var27 = var20 + var25;
++                                        var28 = var17 + (var24 - 1) * var23;
++                                        if(var25 < 0 && !this.blockIsGood(var1.getBlockId(var26, var27, var28))) {
++                                            continue label234;
++                                        }
++                                    }
++                                }
++
++                                var32 = (double)var20 + 0.5D - var2.posY;
++                                var33 = var15 * var15 + var32 * var32 + var18 * var18;
++                                if(var4 < 0.0D || var33 < var4) {
++                                    var4 = var33;
++                                    var9 = var14;
++                                    var10 = var20;
++                                    var11 = var17;
++                                    var12 = var21 % 2;
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++        }
++
++        int var30 = var9;
++        int var16 = var10;
++        var17 = var11;
++        int var31 = var12 % 2;
++        int var19 = 1 - var31;
++        if(var12 % 4 >= 2) {
++            var31 = -var31;
++            var19 = -var19;
++        }
++
++        boolean var34;
++        if(var4 < 0.0D) {
++            if(var10 < 70) {
++                var10 = 70;
++            }
++
++            if(var10 > 128 - 10) {
++                var10 = 128 - 10;
++            }
++
++            var16 = var10;
++
++            for(var20 = -1; var20 <= 1; ++var20) {
++                for(var21 = 1; var21 < 3; ++var21) {
++                    for(var22 = -1; var22 < 3; ++var22) {
++                        var23 = var30 + (var21 - 1) * var31 + var20 * var19;
++                        var24 = var16 + var22;
++                        var25 = var17 + (var21 - 1) * var19 - var20 * var31;
++                        var34 = var22 < 0;
++                        var1.setBlockWithNotify(var23, var24, var25, var34 ? Block.blockGold.blockID : 0);
++                    }
++                }
++            }
++        }
++
++        for(var20 = 0; var20 < 4; ++var20) {
++            var1.editingBlocks = true;
++
++            for(var21 = 0; var21 < 4; ++var21) {
++                for(var22 = -1; var22 < 4; ++var22) {
++                    var23 = var30 + (var21 - 1) * var31;
++                    var24 = var16 + var22;
++                    var25 = var17 + (var21 - 1) * var19;
++                    var34 = var21 == 0 || var21 == 3 || var22 == -1 || var22 == 3;
++                    var1.setBlockWithNotify(var23, var24, var25, var34 ? Block.blockGold.blockID : mod_SkylandsPortal.skylandsPortal.blockID);
++                }
++            }
++
++            var1.editingBlocks = false;
++
++            for(var21 = 0; var21 < 4; ++var21) {
++                for(var22 = -1; var22 < 4; ++var22) {
++                    var23 = var30 + (var21 - 1) * var31;
++                    var24 = var16 + var22;
++                    var25 = var17 + (var21 - 1) * var19;
++                    var1.notifyBlocksOfNeighborChange(var23, var24, var25, var1.getBlockId(var23, var24, var25));
++                }
++            }
++        }
++
++        return true;
++    }
++
++    public boolean blockIsGood(int blockId) {
++        if (blockId == 0) {
++            return false;
++        }
++
++        return Block.blocksList[blockId].renderAsNormalBlock() && Block.blocksList[blockId].isOpaqueCube();
++    }
++}
+--- /dev/null
++++ net/minecraft/src/SkylandsPortalGuiAPI.java
+@@ -1,0 +1,75 @@
++package net.minecraft.src;
++
++public class SkylandsPortalGuiAPI {
++    public static SettingBoolean overworldBiomeInSky;
++
++    public static SettingInt skylandsPortalBlockId;
++    public static SettingInt altAirBlockId;
++
++    public static SettingInt goldenStickItemId;
++    public static SettingInt magicWandItemId;
++
++    public SkylandsPortalGuiAPI() {
++        ModSettings skylandsPortalSettings = new ModSettings("skylandsportal");
++        ModSettingScreen skylandsPortalSettingScreen = new ModSettingScreen("Skylands Portal");
++
++        skylandsPortalSettings.append(overworldBiomeInSky = new SettingBoolean("overworldBiomesInSky", false));
++        skylandsPortalSettings.append(altAirBlockId = new SettingInt("altAirBlockId", 200, 110, 255));
++        skylandsPortalSettings.append(skylandsPortalBlockId = new SettingInt("skylandsPortalBlockId", 201, 110, 255));
++        skylandsPortalSettings.append(goldenStickItemId = new SettingInt("goldenStickItemId", 10000, 113, 31999));
++        skylandsPortalSettings.append(magicWandItemId = new SettingInt("magicWandItemId", 10001, 113, 31999));
++
++        WidgetBoolean overworldBiomeInSkyWidget = new WidgetBoolean(overworldBiomeInSky, "Overworld Biomes In Sky");
++        overworldBiomeInSkyWidget.addCallback(new ModAction(this, "setOverworldBiomesInSky"));
++
++        WidgetInt altAirWidget = new WidgetInt(altAirBlockId, "Alt Air Id");
++        altAirWidget.addCallback(new ModAction(this, "setAltAirBlockId"));
++
++        WidgetInt skylandsPortalWidget = new WidgetInt(skylandsPortalBlockId, "Sky Portal Id");
++        skylandsPortalWidget.addCallback(new ModAction(this, "setSkylandsPortalBlockId"));
++
++        WidgetInt goldenStickWidget = new WidgetInt(goldenStickItemId, "Golden Stick Id");
++        goldenStickWidget.addCallback(new ModAction(this, "setGoldenStickItemId"));
++
++        WidgetInt magicWandWidget = new WidgetInt(magicWandItemId, "Magic Wand Id");
++        magicWandWidget.addCallback(new ModAction(this, "setMagicWandItemId"));
++
++        skylandsPortalSettingScreen.append(overworldBiomeInSkyWidget);
++        skylandsPortalSettingScreen.append(altAirWidget);
++        skylandsPortalSettingScreen.append(skylandsPortalWidget);
++        skylandsPortalSettingScreen.append(goldenStickWidget);
++        skylandsPortalSettingScreen.append(magicWandWidget);
++        skylandsPortalSettings.load();
++
++        overworldBiomeInSky.set(SkylandsPortalConfig.overworldBiomesInSky);
++        altAirBlockId.set(SkylandsPortalConfig.altAirBlockId);
++        skylandsPortalBlockId.set(SkylandsPortalConfig.skylandsPortalBlockId);
++        goldenStickItemId.set(SkylandsPortalConfig.goldenStickItemId);
++        magicWandItemId.set(SkylandsPortalConfig.magicWandItemId);
++    }
++
++    private void setOverworldBiomesInSky() {
++        SkylandsPortalConfig.overworldBiomesInSky = overworldBiomeInSky.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setAltAirBlockId() {
++        SkylandsPortalConfig.altAirBlockId = altAirBlockId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setSkylandsPortalBlockId() {
++        SkylandsPortalConfig.skylandsPortalBlockId = skylandsPortalBlockId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setGoldenStickItemId() {
++        SkylandsPortalConfig.goldenStickItemId = goldenStickItemId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setMagicWandItemId() {
++        SkylandsPortalConfig.magicWandItemId = magicWandItemId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++}
+--- /dev/null
++++ net/minecraft/src/EntitySkylandsLightningBolt.java
+@@ -1,0 +1,38 @@
++package net.minecraft.src;
++
++public class EntitySkylandsLightningBolt extends EntityLightningBolt {
++    private int lightningState;
++    private int boltLivingTime;
++
++    public EntitySkylandsLightningBolt(World var1, double var2, double var4, double var6) {
++        super(var1, var2, var4, var6);
++        this.lightningState = 2;
++        this.boltLivingTime = this.rand.nextInt(3) + 1;
++    }
++
++    public void onUpdate() {
++        if (this.lightningState == 2) {
++            this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "ambient.weather.thunder", 10000.0F, 0.8F + this.rand.nextFloat() * 0.2F);
++            this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "random.explode", 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
++        }
++
++        --this.lightningState;
++        if (this.lightningState < 0) {
++            if (this.boltLivingTime == 0) {
++                this.setEntityDead();
++            } else if (this.lightningState < -this.rand.nextInt(10)) {
++                --this.boltLivingTime;
++                this.lightningState = 1;
++            }
++        }
++
++        if (this.lightningState >= 0) {
++            this.worldObj.field_27172_i = 2;
++        }
++
++    }
++
++    public boolean isInRangeToRenderVec3D(Vec3D var1) {
++        return this.lightningState >= 0;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/BlockSkylandsPortal.java
+@@ -1,0 +1,183 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class BlockSkylandsPortal extends BlockPortal {
++    public BlockSkylandsPortal(int var1, int var2) {
++        super(var1, var2);
++    }
++
++    public boolean tryToCreatePortal(World var1, int var2, int var3, int var4) {
++        byte var5 = 0;
++        byte var6 = 0;
++        if(var1.getBlockId(var2 - 1, var3, var4) == Block.blockGold.blockID || var1.getBlockId(var2 + 1, var3, var4) == Block.blockGold.blockID) {
++            var5 = 1;
++        }
++
++        if(var1.getBlockId(var2, var3, var4 - 1) == Block.blockGold.blockID || var1.getBlockId(var2, var3, var4 + 1) == Block.blockGold.blockID) {
++            var6 = 1;
++        }
++
++        if(var5 == var6) {
++            return false;
++        } else {
++            if(var1.getBlockId(var2 - var5, var3, var4 - var6) == 0) {
++                var2 -= var5;
++                var4 -= var6;
++            }
++
++            int var7;
++            int var8;
++            for(var7 = -1; var7 <= 2; ++var7) {
++                for(var8 = -1; var8 <= 3; ++var8) {
++                    boolean var9 = var7 == -1 || var7 == 2 || var8 == -1 || var8 == 3;
++                    if(var7 != -1 && var7 != 2 || var8 != -1 && var8 != 3) {
++                        int var10 = var1.getBlockId(var2 + var5 * var7, var3 + var8, var4 + var6 * var7);
++                        if(var9) {
++                            if(var10 != Block.blockGold.blockID) {
++                                return false;
++                            }
++                        } else if(var10 != 0 && var10 != mod_SkylandsPortal.altAir.blockID) {
++                            return false;
++                        }
++                    }
++                }
++            }
++
++            var1.editingBlocks = true;
++
++            for(var7 = 0; var7 < 2; ++var7) {
++                for(var8 = 0; var8 < 3; ++var8) {
++                    var1.setBlockWithNotify(var2 + var5 * var7, var3 + var8, var4 + var6 * var7, mod_SkylandsPortal.skylandsPortal.blockID);
++                }
++            }
++
++            var1.editingBlocks = false;
++            return true;
++        }
++    }
++
++    public boolean isValidPortalFrame(World world, int x, int y, int z) {
++        byte offsetX = 0;
++        byte offsetZ = 0;
++
++        if (world.getBlockId(x - 1, y, z) == Block.blockGold.blockID || world.getBlockId(x + 1, y, z) == Block.blockGold.blockID) {
++            offsetX = 1;
++        }
++
++        if (world.getBlockId(x, y, z - 1) == Block.blockGold.blockID || world.getBlockId(x, y, z + 1) == Block.blockGold.blockID) {
++            offsetZ = 1;
++        }
++
++        if (offsetX == offsetZ) {
++            return false;
++        }
++
++        if (world.getBlockId(x - offsetX, y, z - offsetZ) == 0) {
++            x -= offsetX;
++            z -= offsetZ;
++        }
++
++        for (int dx = -1; dx <= 2; dx++) {
++            for (int dy = -1; dy <= 3; dy++) {
++                boolean isFrame = dx == -1 || dx == 2 || dy == -1 || dy == 3;
++                int checkX = x + offsetX * dx;
++                int checkY = y + dy;
++                int checkZ = z + offsetZ * dx;
++
++                int blockId = world.getBlockId(checkX, checkY, checkZ);
++
++                if (isFrame) {
++                    if (blockId != Block.blockGold.blockID) {
++                        return false;
++                    }
++                } else {
++                    if (blockId != 0 && blockId != mod_SkylandsPortal.altAir.blockID) {
++                        return false;
++                    }
++                }
++            }
++        }
++
++        return true;
++    }
++
++    public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
++        byte var6 = 0;
++        byte var7 = 1;
++        if(var1.getBlockId(var2 - 1, var3, var4) == this.blockID || var1.getBlockId(var2 + 1, var3, var4) == this.blockID) {
++            var6 = 1;
++            var7 = 0;
++        }
++
++        int var8;
++        for(var8 = var3; var1.getBlockId(var2, var8 - 1, var4) == this.blockID; --var8) {
++        }
++
++        if(var1.getBlockId(var2, var8 - 1, var4) != Block.blockGold.blockID) {
++            var1.setBlockWithNotify(var2, var3, var4, 0);
++        } else {
++            int var9;
++            for(var9 = 1; var9 < 4 && var1.getBlockId(var2, var8 + var9, var4) == this.blockID; ++var9) {
++            }
++
++            if(var9 == 3 && var1.getBlockId(var2, var8 + var9, var4) == Block.blockGold.blockID) {
++                boolean var10 = var1.getBlockId(var2 - 1, var3, var4) == this.blockID || var1.getBlockId(var2 + 1, var3, var4) == this.blockID;
++                boolean var11 = var1.getBlockId(var2, var3, var4 - 1) == this.blockID || var1.getBlockId(var2, var3, var4 + 1) == this.blockID;
++                if(var10 && var11) {
++                    var1.setBlockWithNotify(var2, var3, var4, 0);
++                } else if((var1.getBlockId(var2 + var6, var3, var4 + var7) != Block.blockGold.blockID || var1.getBlockId(var2 - var6, var3, var4 - var7) != this.blockID) && (var1.getBlockId(var2 - var6, var3, var4 - var7) != Block.blockGold.blockID || var1.getBlockId(var2 + var6, var3, var4 + var7) != this.blockID)) {
++                    var1.setBlockWithNotify(var2, var3, var4, 0);
++                }
++            } else {
++                var1.setBlockWithNotify(var2, var3, var4, 0);
++            }
++        }
++    }
++
++    public void onEntityCollidedWithBlock(World var1, int var2, int var3, int var4, Entity var5) {
++        if(var5.ridingEntity == null && var5.riddenByEntity == null) {
++            if(var5 instanceof EntityPlayerSP) {
++                EntityPlayerSP entityplayersp = (EntityPlayerSP)var5;
++                ((PlayerBaseSAPI)((PlayerBaseSAPI)PlayerAPI.getPlayerBase(entityplayersp, PlayerBaseSAPI.class))).portal = this.getDimNumber();
++            }
++
++            var5.setInPortal();
++        }
++
++    }
++
++    public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
++        if(var5.nextInt(100) == 0) {
++            var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "portal.portal", 1.0F, var5.nextFloat() * 0.4F + 0.8F);
++        }
++
++        for(int var6 = 0; var6 < 4; ++var6) {
++            double var7 = (double)((float)var2 + var5.nextFloat());
++            double var9 = (double)((float)var3 + var5.nextFloat());
++            double var11 = (double)((float)var4 + var5.nextFloat());
++            double var13 = 0.0D;
++            double var15 = 0.0D;
++            double var17 = 0.0D;
++            int var19 = var5.nextInt(2) * 2 - 1;
++            var13 = ((double)var5.nextFloat() - 0.5D) * 0.5D;
++            var15 = ((double)var5.nextFloat() - 0.5D) * 0.5D;
++            var17 = ((double)var5.nextFloat() - 0.5D) * 0.5D;
++            if(var1.getBlockId(var2 - 1, var3, var4) != this.blockID && var1.getBlockId(var2 + 1, var3, var4) != this.blockID) {
++                var7 = (double)var2 + 0.5D + 0.25D * (double)var19;
++                var13 = (double)(var5.nextFloat() * 2.0F * (float)var19);
++            } else {
++                var11 = (double)var4 + 0.5D + 0.25D * (double)var19;
++                var17 = (double)(var5.nextFloat() * 2.0F * (float)var19);
++            }
++
++            EntityPortalFX skylandsPortalParticle = new EntitySkylandsPortalFX(var1, var7, var9, var11, var13, var15, var17);
++            ModLoader.getMinecraftInstance().effectRenderer.addEffect(skylandsPortalParticle);
++        }
++
++    }
++
++    public int getDimNumber() {
++        return 1;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/TextureSkylandsPortalFX.java
+@@ -1,0 +1,9 @@
++package net.minecraft.src;
++
++import java.awt.image.BufferedImage;
++
++public class TextureSkylandsPortalFX extends ModTextureAnimation {
++	public TextureSkylandsPortalFX(int slot, int size, int dst, BufferedImage source, int rate) {
++		super(slot, size, dst, source, rate);
++	}
++}
+--- /dev/null
++++ net/minecraft/src/BlockAltAir.java
+@@ -1,0 +1,37 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class BlockAltAir extends Block {
++    protected BlockAltAir(int var1, int var2, Material var3) {
++        super(var1, var2, var3);
++    }
++
++    public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
++        return null;
++    }
++
++    public boolean isOpaqueCube() {
++        return false;
++    }
++
++    public boolean renderAsNormalBlock() {
++        return false;
++    }
++
++    public void onBlockAdded(World var1, int var2, int var3, int var4){
++        var1.scheduleBlockUpdate(var2, var3, var4, this.blockID, 20);
++    }
++
++    public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
++        var1.setBlock(var2, var3, var4, 0);
++    }
++
++    public int quantityDropped(Random var1) {
++        return 0;
++    }
++
++    public boolean isCollidable() {
++        return false;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/WorldProviderSkylands.java
+@@ -1,0 +1,17 @@
++package net.minecraft.src;
++
++public class WorldProviderSkylands extends WorldProviderSky {
++    public void registerWorldChunkManager() {
++        if (SkylandsPortalConfig.overworldBiomesInSky) {
++            this.worldChunkMgr = new WorldChunkManager(this.worldObj);
++        } else {
++            this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.sky, 0.5F, 0.0F);
++        }
++
++        this.worldType = 1;
++    }
++
++    public boolean canRespawnHere() {
++        return false;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/SkylandsPortalConfig.java
+@@ -1,0 +1,78 @@
++package net.minecraft.src;
++
++import net.minecraft.client.Minecraft;
++
++import java.io.*;
++import java.util.Properties;
++
++public class SkylandsPortalConfig {
++	private static final File configFile = new File(Minecraft.getMinecraftDir(), "config/SkylandsPortal.cfg");
++	private static final LinkedProperties props = new LinkedProperties();
++
++	public static boolean overworldBiomesInSky = false;
++	public static int altAirBlockId = 200;
++	public static int skylandsPortalBlockId = 201;
++	public static int goldenStickItemId = 10000;
++	public static int magicWandItemId = 10001;
++
++	public static void loadConfig() {
++		try {
++			if (!configFile.exists()) {
++				configFile.getParentFile().mkdirs();
++				saveConfig();
++			}
++
++			FileInputStream in = new FileInputStream(configFile);
++			props.load(in);
++			in.close();
++
++			overworldBiomesInSky = Boolean.parseBoolean(props.getProperty("overworldBiomesInSky", "false"));
++			altAirBlockId = Integer.parseInt(props.getProperty("altAirBlockId", "200"));
++			skylandsPortalBlockId = Integer.parseInt(props.getProperty("skylandsPortalBlockId", "201"));
++			goldenStickItemId = Integer.parseInt(props.getProperty("goldenStickItemId", "10000"));
++			magicWandItemId = Integer.parseInt(props.getProperty("magicWandItemId", "10001"));
++		} catch (Exception e) {
++			e.printStackTrace();
++		}
++	}
++
++	public static void saveConfig() {
++		try {
++			props.clear();
++
++			props.setProperty("overworldBiomesInSky", String.valueOf(overworldBiomesInSky));
++			props.setProperty("altAirBlockId", String.valueOf(altAirBlockId));
++			props.setProperty("skylandsPortalBlockId", String.valueOf(skylandsPortalBlockId));
++			props.setProperty("goldenStickItemId", String.valueOf(goldenStickItemId));
++			props.setProperty("magicWandItemId", String.valueOf(magicWandItemId));
++
++			FileOutputStream out = new FileOutputStream(configFile);
++			storeWithoutTimestamp(props, out, "Skylands Portal Config");
++			out.close();
++		} catch (Exception e) {
++			e.printStackTrace();
++		}
++	}
++
++	private static void storeWithoutTimestamp(Properties props, OutputStream out, String comment) throws IOException {
++		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
++		if (comment != null && !comment.isEmpty()) {
++			writer.write("# " + comment);
++			writer.newLine();
++		}
++
++		for (Object keyObj : props.keySet()) {
++			String key = (String) keyObj;
++			String value = props.getProperty(key);
++
++			if (key.startsWith("#")) {
++				writer.newLine();
++				writer.write(key);
++			} else {
++				writer.write(key + "=" + value);
++			}
++			writer.newLine();
++		}
++		writer.flush();
++	}
++}
+--- /dev/null
++++ net/minecraft/src/ItemMagicWand.java
+@@ -1,0 +1,51 @@
++package net.minecraft.src;
++
++public class ItemMagicWand extends ItemFlintAndSteel {
++    public ItemMagicWand(int var1) {
++        super(var1);
++    }
++
++    public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
++        if(var7 == 0) {
++            --var5;
++        }
++
++        if(var7 == 1) {
++            ++var5;
++        }
++
++        if(var7 == 2) {
++            --var6;
++        }
++
++        if(var7 == 3) {
++            ++var6;
++        }
++
++        if(var7 == 4) {
++            --var4;
++        }
++
++        if(var7 == 5) {
++            ++var4;
++        }
++
++        if (var2.dimension != -1) {
++            int var8 = var3.getBlockId(var4, var5, var6);
++            int var9 = var3.getBlockId(var4, var5 - 1, var6);
++            boolean var10 = ((BlockSkylandsPortal) mod_SkylandsPortal.skylandsPortal).isValidPortalFrame(var3, var4, var5, var6);
++
++            if (!var10) {
++                return false;
++            }
++
++            if (var8 == 0 && var9 == Block.blockGold.blockID) {
++                var3.setBlockWithNotify(var4, var5, var6, mod_SkylandsPortal.altAir.blockID);
++            }
++
++            var1.damageItem(65, var2);
++        }
++
++        return true;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/DimensionSkylands.java
+@@ -1,0 +1,13 @@
++package net.minecraft.src;
++
++public class DimensionSkylands extends DimensionBase {
++    public DimensionSkylands() {
++        super(1, WorldProviderSkylands.class, TeleporterSkylands.class);
++        this.name = "Skylands";
++    }
++
++    public Loc getDistanceScale(Loc loc, boolean flag) {
++        double d = flag ? 8.0D : 0.125D;
++        return loc.multiply(d, 1.0D, d);
++    }
++}
+--- /dev/null
++++ net/minecraft/src/EntitySkylandsPortalFX.java
+@@ -1,0 +1,12 @@
++package net.minecraft.src;
++
++public class EntitySkylandsPortalFX extends EntityPortalFX {
++
++    public EntitySkylandsPortalFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12) {
++        super(var1, var2, var4, var6, var8, var10, var12);
++        float var14 = this.rand.nextFloat() * 0.6F + 0.4F;
++        this.particleRed = 0.39F * var14;
++        this.particleGreen = 0.71F * var14;
++        this.particleBlue = 0.98F * var14;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/LinkedProperties.java
+@@ -1,0 +1,26 @@
++package net.minecraft.src;
++
++import java.util.*;
++
++public class LinkedProperties extends Properties {
++    private final List<Object> keys = new ArrayList<>();
++
++    @Override
++    public synchronized Object put(Object key, Object value) {
++        if (!keys.contains(key)) {
++            keys.add(key);
++        }
++        return super.put(key, value);
++    }
++
++    @Override
++    public Set<Object> keySet() {
++        return new LinkedHashSet<>(keys);
++    }
++
++    @Override
++    public synchronized Enumeration<Object> keys() {
++        return Collections.enumeration(keys);
++    }
++}
++
