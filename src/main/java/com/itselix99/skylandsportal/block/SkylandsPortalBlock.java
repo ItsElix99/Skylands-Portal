@@ -2,10 +2,13 @@ package com.itselix99.skylandsportal.block;
 
 import com.itselix99.skylandsportal.SkylandsPortal;
 import com.itselix99.skylandsportal.event.TextureListener;
+import com.itselix99.skylandsportal.particle.SkylandsPortalParticle;
 import com.itselix99.skylandsportal.portal.SkylandsPortalForcer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.PortalForcer;
@@ -178,7 +181,8 @@ public class SkylandsPortalBlock extends TemplateNetherPortalBlock implements Cu
                 var17 = (double)(random.nextFloat() * 2.0F * (float)var19);
             }
 
-            world.addParticle("skylands_portal", var7, var9, var11, var13, var15, var17);
+            SkylandsPortalParticle skylandsPortalParticle = new SkylandsPortalParticle(world, var7, var9, var11, var13, var15, var17);
+            ((Minecraft) FabricLoaderImpl.INSTANCE.getGameInstance()).particleManager.addParticle(skylandsPortalParticle);
         }
     }
 

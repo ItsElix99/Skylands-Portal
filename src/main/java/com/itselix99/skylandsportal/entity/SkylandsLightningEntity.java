@@ -13,7 +13,6 @@ public class SkylandsLightningEntity extends LightningEntity {
 
     public SkylandsLightningEntity(World world, double x, double y, double z) {
         super(world, x, y, z);
-        this.setPositionAndAnglesKeepPrevAngles(x, y, z, 0.0F, 0.0F);
         this.ambientTick = 2;
         this.remainingActions = this.random.nextInt(3) + 1;
     }
@@ -38,15 +37,6 @@ public class SkylandsLightningEntity extends LightningEntity {
             this.world.lightningTicksLeft = 2;
         }
 
-    }
-
-    protected void initDataTracker() {
-    }
-
-    protected void readNbt(NbtCompound nbt) {
-    }
-
-    protected void writeNbt(NbtCompound nbt) {
     }
 
     @Environment(EnvType.CLIENT)

@@ -11,8 +11,7 @@
   "server": [
   ],
   "client": [
-    "client.InGameHudMixin",
-    "client.WorldRendererMixin"
+    "client.InGameHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1

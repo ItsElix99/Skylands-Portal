@@ -30,6 +30,10 @@ public class SkylandsDimensionMixin extends Dimension implements TravelMessagePr
         return TranslationStorage.getInstance().get("skylands.leaving");
     }
 
+    @Override
+    public boolean hasWorldSpawn() {
+        return false;
+    }
 
     @Inject(method = "initBiomeSource", at = @At("TAIL"))
     private void sp_overworldBiomesInSky(CallbackInfo ci) {
