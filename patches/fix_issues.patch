@@ -1,0 +1,174 @@
+--- net/minecraft/src/SettingText.java
++++ net/minecraft/src/SettingText.java
+@@ -34,12 +34,4 @@
+ 		}
+ 
+ 	}
+-
+-	public Object get(String var1) {
+-		return this.get(var1);
+-	}
+-
+-	public void set(Object var1, String var2) {
+-		this.set((String)var1, var2);
+-	}
+ }
+--- net/minecraft/src/SettingBoolean.java
++++ net/minecraft/src/SettingBoolean.java
+@@ -38,12 +38,4 @@
+ 		}
+ 
+ 	}
+-
+-	public Object get(String var1) {
+-		return this.get(var1);
+-	}
+-
+-	public void set(Object var1, String var2) {
+-		this.set((Boolean)var1, var2);
+-	}
+ }
+--- net/minecraft/src/SettingInt.java
++++ net/minecraft/src/SettingInt.java
+@@ -66,12 +66,4 @@
+ 	public Integer get(String context) {
+ 		return this.values.get(context) != null ? (Integer)this.values.get(context) : (this.values.get("") != null ? (Integer)this.values.get("") : (Integer)this.defvalue);
+ 	}
+-
+-	public Object get(String var1) {
+-		return this.get(var1);
+-	}
+-
+-	public void set(Object var1, String var2) {
+-		this.set((Integer)var1, var2);
+-	}
+ }
+--- net/minecraft/src/SettingMulti.java
++++ net/minecraft/src/SettingMulti.java
+@@ -96,12 +96,4 @@
+ 	public void next() {
+ 		this.next(ModSettings.currentContext);
+ 	}
+-
+-	public Object get(String var1) {
+-		return this.get(var1);
+-	}
+-
+-	public void set(Object var1, String var2) {
+-		this.set((Integer)var1, var2);
+-	}
+ }
+--- net/minecraft/src/ModLoader.java
++++ net/minecraft/src/ModLoader.java
+@@ -371,7 +371,7 @@
+ 		Object overlays = (Map)overrides.get(Integer.valueOf(dst1));
+ 		if(overlays == null) {
+ 			overlays = new HashMap();
+-			overrides.put(Integer.valueOf(dst1), overlays);
++			overrides.put(Integer.valueOf(dst1), (Map<String, Integer>) overlays);
+ 		}
+ 
+ 		((Map)overlays).put(overlayPath, Integer.valueOf(index));
+@@ -482,7 +482,7 @@
+ 		return instance;
+ 	}
+ 
+-	public static <T, E> T getPrivateValue(Class<? super E> instanceclass, E instance, int fieldindex) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
++	public static Object getPrivateValue(Class<?> instanceclass, Object instance, int fieldindex) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
+ 		try {
+ 			Field e = instanceclass.getDeclaredFields()[fieldindex];
+ 			e.setAccessible(true);
+@@ -494,7 +494,7 @@
+ 		}
+ 	}
+ 
+-	public static <T, E> T getPrivateValue(Class<? super E> instanceclass, E instance, String field) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
++	public static Object getPrivateValue(Class<?> instanceclass, Object instance, String field) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
+ 		try {
+ 			Field e = instanceclass.getDeclaredField(field);
+ 			e.setAccessible(true);
+@@ -995,44 +995,7 @@
+ 	private static void readFromClassPath(File source) throws FileNotFoundException, IOException {
+ 		logger.finer("Adding mods from " + source.getCanonicalPath());
+ 		ClassLoader loader = ModLoader.class.getClassLoader();
+-		String name;
+-		if(source.isFile() && (source.getName().endsWith(".jar") || source.getName().endsWith(".zip"))) {
+-			logger.finer("Zip found.");
+-			FileInputStream var6 = new FileInputStream(source);
+-			ZipInputStream var8 = new ZipInputStream(var6);
+-			ZipEntry var9 = null;
+-
+-			while(true) {
+-				var9 = var8.getNextEntry();
+-				if(var9 == null) {
+-					var6.close();
+-					break;
+-				}
+-
+-				name = var9.getName();
+-				if(!var9.isDirectory() && name.startsWith("mod_") && name.endsWith(".class")) {
+-					addMod(loader, name);
+-				}
+-			}
+-		} else if(source.isDirectory()) {
+-			Package pkg = ModLoader.class.getPackage();
+-			if(pkg != null) {
+-				String files = pkg.getName().replace('.', File.separatorChar);
+-				source = new File(source, files);
+-			}
+-
+-			logger.finer("Directory found.");
+-			File[] var7 = source.listFiles();
+-			if(var7 != null) {
+-				for(int i = 0; i < var7.length; ++i) {
+-					name = var7[i].getName();
+-					if(var7[i].isFile() && name.startsWith("mod_") && name.endsWith(".class")) {
+-						addMod(loader, name);
+-					}
+-				}
+-			}
+-		}
+-
++		addMod(loader, "mod_SkylandsPortal");
+ 	}
+ 
+ 	public static KeyBinding[] RegisterAllKeys(KeyBinding[] w) {
+@@ -1170,7 +1133,7 @@
+ 		}
+ 
+ 		((Map)keyMap).put(keyHandler, new boolean[]{allowRepeat, false});
+-		keyList.put(mod, keyMap);
++		keyList.put(mod, (Map<KeyBinding, boolean[]>) keyMap);
+ 	}
+ 
+ 	public static void RegisterTileEntity(Class<? extends TileEntity> tileEntityClass, String id) {
+--- net/minecraft/src/SettingFloat.java
++++ net/minecraft/src/SettingFloat.java
+@@ -64,12 +64,4 @@
+ 	public Float get(String context) {
+ 		return this.values.get(context) != null ? (Float)this.values.get(context) : (this.values.get("") != null ? (Float)this.values.get("") : (Float)this.defvalue);
+ 	}
+-
+-	public Object get(String var1) {
+-		return this.get(var1);
+-	}
+-
+-	public void set(Object var1, String var2) {
+-		this.set((Float)var1, var2);
+-	}
+ }
+--- net/minecraft/src/SettingKey.java
++++ net/minecraft/src/SettingKey.java
+@@ -61,12 +61,4 @@
+ 	public boolean isKeyDown() {
+ 		return this.isKeyDown(ModSettings.currentContext);
+ 	}
+-
+-	public Object get(String var1) {
+-		return this.get(var1);
+-	}
+-
+-	public void set(Object var1, String var2) {
+-		this.set((Integer)var1, var2);
+-	}
+ }
