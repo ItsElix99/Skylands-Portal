@@ -1,0 +1,220 @@
+--- net/minecraft/src/SettingText.java
++++ net/minecraft/src/SettingText.java
+@@ -34,12 +34,4 @@
+ 	public String toString(String context) {
+ 		return this.get(context);
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((String)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- sapi/DimensionBase.java
++++ sapi/DimensionBase.java
+@@ -182,18 +182,18 @@
+ 
+ 		world = null;
+ 		DimensionBase dimensionbase1 = getDimByNumber(j);
+-		DimensionBase dimensionbase1 = getDimByNumber(k);
++		DimensionBase dimensionbase2 = getDimByNumber(k);
+ 		loc = dimensionbase1.getDistanceScale(loc, true);
+-		loc = dimensionbase1.getDistanceScale(loc, false);
++		loc = dimensionbase2.getDistanceScale(loc, false);
+ 		minecraft.thePlayer.dimension = k;
+ 		minecraft.thePlayer.setLocationAndAngles(loc.x, minecraft.thePlayer.posY, loc.z, minecraft.thePlayer.rotationYaw, minecraft.thePlayer.rotationPitch);
+ 		minecraft.theWorld.updateEntityWithOptionalForce(minecraft.thePlayer, false);
+-		World world1 = new World(minecraft.theWorld, dimensionbase1.getWorldProvider());
+-		minecraft.changeWorld(world1, (k != 0 ? "Entering" : "Leaving") + " the " + (k != 0 ? dimensionbase1.name : dimensionbase1.name), minecraft.thePlayer);
++		World world1 = new World(minecraft.theWorld, dimensionbase2.getWorldProvider());
++		minecraft.changeWorld(world1, (k != 0 ? "Entering" : "Leaving") + " the " + (k != 0 ? dimensionbase2.name : dimensionbase1.name), minecraft.thePlayer);
+ 		minecraft.thePlayer.worldObj = minecraft.theWorld;
+ 		minecraft.thePlayer.setLocationAndAngles(loc.x, minecraft.thePlayer.posY, loc.z, minecraft.thePlayer.rotationYaw, minecraft.thePlayer.rotationPitch);
+ 		minecraft.theWorld.updateEntityWithOptionalForce(minecraft.thePlayer, false);
+-		Teleporter teleporter1 = dimensionbase1.getTeleporter();
++		Teleporter teleporter1 = dimensionbase2.getTeleporter();
+ 		if(teleporter1 == null) {
+ 			teleporter1 = dimensionbase1.getTeleporter();
+ 		}
+--- net/minecraft/src/SettingBoolean.java
++++ net/minecraft/src/SettingBoolean.java
+@@ -38,12 +38,4 @@
+ 	public String toString(String context) {
+ 		return this.get(context).booleanValue() ? "true" : "false";
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Boolean)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/SettingMulti.java
++++ net/minecraft/src/SettingMulti.java
+@@ -96,12 +96,4 @@
+ 	public String toString(String context) {
+ 		return this.labelValues[this.get(context).intValue()];
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Integer)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/SettingKey.java
++++ net/minecraft/src/SettingKey.java
+@@ -61,12 +61,4 @@
+ 	public String toString(String context) {
+ 		return Keyboard.getKeyName(this.get(context).intValue());
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Integer)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/GuiAchievements.java
++++ net/minecraft/src/GuiAchievements.java
+@@ -357,14 +357,14 @@
+ 		}
+ 
+ 		float f1 = (float)(i1 >> 24 & 255) / 255.0F;
+-		float f1 = (float)(i1 >> 16 & 255) / 255.0F;
++		float f4 = (float)(i1 >> 16 & 255) / 255.0F;
+ 		float f2 = (float)(i1 >> 8 & 255) / 255.0F;
+ 		float f3 = (float)(i1 & 255) / 255.0F;
+ 		Tessellator tessellator = Tessellator.instance;
+ 		GL11.glEnable(GL11.GL_BLEND);
+ 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+ 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+-		GL11.glColor4f(f1, f2, f3, f1);
++		GL11.glColor4f(f4, f2, f3, f1);
+ 		if(this.draw) {
+ 			tessellator.startDrawingQuads();
+ 			tessellator.addVertex((double)i, (double)l, 0.0D);
+--- net/minecraft/src/SettingInt.java
++++ net/minecraft/src/SettingInt.java
+@@ -66,12 +66,4 @@
+ 	public String toString(String context) {
+ 		return "" + this.get(context);
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Integer)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }
+--- net/minecraft/src/ModLoader.java
++++ net/minecraft/src/ModLoader.java
+@@ -298,7 +298,7 @@
+ 		Object overlays = (Map)overrides.get(Integer.valueOf(dst1));
+ 		if(overlays == null) {
+ 			overlays = new HashMap();
+-			overrides.put(Integer.valueOf(dst1), overlays);
++			overrides.put(Integer.valueOf(dst1), (Map<String, Integer>) overlays);
+ 		}
+ 
+ 		((Map)overlays).put(overlayPath, Integer.valueOf(index));
+@@ -416,7 +416,7 @@
+ 		return instance;
+ 	}
+ 
+-	public static <T, E> T getPrivateValue(Class<? super E> instanceclass, E instance, int fieldindex) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
++	public static Object getPrivateValue(Class<?> instanceclass, Object instance, int fieldindex) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
+ 		try {
+ 			Field e = instanceclass.getDeclaredFields()[fieldindex];
+ 			e.setAccessible(true);
+@@ -428,7 +428,7 @@
+ 		}
+ 	}
+ 
+-	public static <T, E> T getPrivateValue(Class<? super E> instanceclass, E instance, String field) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
++	public static Object getPrivateValue(Class<?> instanceclass, Object instance, String field) throws IllegalArgumentException, SecurityException, NoSuchFieldException {
+ 		try {
+ 			Field e = instanceclass.getDeclaredField(field);
+ 			e.setAccessible(true);
+@@ -884,44 +884,8 @@
+ 	private static void readFromClassPath(File source) throws FileNotFoundException, IOException {
+ 		logger.finer("Adding mods from " + source.getCanonicalPath());
+ 		ClassLoader loader = ModLoader.class.getClassLoader();
+-		String name;
+-		if(source.isFile() && (source.getName().endsWith(".jar") || source.getName().endsWith(".zip"))) {
+-			logger.finer("Zip found.");
+-			FileInputStream var6 = new FileInputStream(source);
+-			ZipInputStream var8 = new ZipInputStream(var6);
+-			ZipEntry var9 = null;
+-
+-			while(true) {
+-				var9 = var8.getNextEntry();
+-				if(var9 == null) {
+-					var6.close();
+-					break;
+-				}
+-
+-				name = var9.getName();
+-				if(!var9.isDirectory() && name.startsWith("mod_") && name.endsWith(".class")) {
+-					addMod(loader, name);
+-				}
+-			}
+-		} else if(source.isDirectory()) {
+-			Package pkg = ModLoader.class.getPackage();
+-			if(pkg != null) {
+-				String files = pkg.getName().replace('.', File.separatorChar);
+-				source = new File(source, files);
+-			}
+-
+-			logger.finer("Directory found.");
+-			File[] var7 = source.listFiles();
+-			if(var7 != null) {
+-				for(int i = 0; i < var7.length; ++i) {
+-					name = var7[i].getName();
+-					if(var7[i].isFile() && name.startsWith("mod_") && name.endsWith(".class")) {
+-						addMod(loader, name);
+-					}
+-				}
+-			}
+-		}
+-
++		addMod(loader, "mod_SAPI");
++		addMod(loader, "mod_SkylandsPortal");
+ 	}
+ 
+ 	private static void readFromModFolder(File folder) throws IOException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+@@ -1115,7 +1079,7 @@
+ 		}
+ 
+ 		((Map)keyMap).put(keyHandler, new boolean[]{allowRepeat, false});
+-		keyList.put(mod, keyMap);
++		keyList.put(mod, (Map<KeyBinding, boolean[]>) keyMap);
+ 	}
+ 
+ 	public static void RegisterTileEntity(Class<? extends TileEntity> tileEntityClass, String id) {
+--- net/minecraft/src/SettingFloat.java
++++ net/minecraft/src/SettingFloat.java
+@@ -64,12 +64,4 @@
+ 	public String toString(String context) {
+ 		return "" + this.get(context);
+ 	}
+-
+-	public void set(Object x0, String x1) {
+-		this.set((Float)x0, x1);
+-	}
+-
+-	public Object get(String x0) {
+-		return this.get(x0);
+-	}
+ }

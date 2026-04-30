@@ -1,0 +1,1574 @@
+--- /dev/null
++++ net/minecraft/src/ChunkProviderSkylands.java
+@@ -1,0 +1,121 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class ChunkProviderSkylands extends ChunkProviderSky {
++    private World worldObj;
++    private Random rand;
++    private NoiseGeneratorOctaves field_28082_o;
++    private double[] stoneNoise = new double[256];
++
++    public ChunkProviderSkylands(World var1, long var2) {
++        super(var1, var2);
++        this.worldObj = var1;
++        this.rand = new Random(var2);
++        this.field_28082_o = new NoiseGeneratorOctaves(this.rand, 4);
++    }
++
++    public void replaceBlocksForBiome(int var1, int var2, byte[] var3, BiomeGenBase[] var4) {
++        double var5 = 1.0D / 32.0D;
++        this.stoneNoise = this.field_28082_o.generateNoiseOctaves(this.stoneNoise, var1 * 16, var2 * 16, 0, 16, 16, 1, var5 * 2.0D, var5 * 2.0D, var5 * 2.0D);
++
++        for(int var7 = 0; var7 < 16; ++var7) {
++            for(int var8 = 0; var8 < 16; ++var8) {
++                BiomeGenBase var9 = var4[var8 + var7 * 16];
++                int var10 = (int)(this.stoneNoise[var7 + var8 * 16] / 3.0D + 3.0D + this.rand.nextDouble() * 0.25D);
++                int var11 = -1;
++                byte var12 = var9.topBlock;
++                byte var13 = var9.fillerBlock;
++                this.worldObj.getClass();
++
++                for(int var14 = 127; var14 >= 0; --var14) {
++                    int var10000 = var8 * 16 + var7;
++                    this.worldObj.getClass();
++                    int var15 = var10000 * 128 + var14;
++                    byte var16 = var3[var15];
++                    if(var16 == 0) {
++                        var11 = -1;
++                    } else if(var16 == Block.stone.blockID) {
++                        if(var11 == -1) {
++                            if(var10 <= 0) {
++                                var12 = 0;
++                                var13 = (byte)Block.stone.blockID;
++                            }
++
++                            var11 = var10;
++                            if(var14 >= 0) {
++                                var3[var15] = var12;
++                            } else {
++                                var3[var15] = var13;
++                            }
++                        } else if(var11 > 0) {
++                            --var11;
++                            var3[var15] = var13;
++                            if(var11 == 0 && var13 == Block.sand.blockID) {
++                                var11 = this.rand.nextInt(4);
++                                var13 = (byte)Block.sandStone.blockID;
++                            }
++                        }
++                    }
++                }
++            }
++        }
++
++    }
++
++    public void populate(IChunkProvider var1, int var2, int var3) {
++        if (SkylandsPortalConfig.overworldBiomesInSky) {
++            BlockSand.fallInstantly = true;
++            int var4 = var2 * 16;
++            int var5 = var3 * 16;
++            BiomeGenBase var6 = this.worldObj.getWorldChunkManager().getBiomeGenAt(var4 + 16, var5 + 16);
++            this.rand.setSeed(this.worldObj.getRandomSeed());
++            long var7 = this.rand.nextLong() / 2L * 2L + 1L;
++            long var9 = this.rand.nextLong() / 2L * 2L + 1L;
++            this.rand.setSeed((long)var2 * var7 + (long)var3 * var9 ^ this.worldObj.getRandomSeed());
++            boolean var11 = false;
++
++            int var12;
++            int var13;
++            int var14;
++            Random var10000;
++            if(!var11 && this.rand.nextInt(4) == 0) {
++                var12 = var4 + this.rand.nextInt(16) + 8;
++                var10000 = this.rand;
++                this.worldObj.getClass();
++                var13 = var10000.nextInt(128);
++                var14 = var5 + this.rand.nextInt(16) + 8;
++                (new WorldGenLakes(Block.waterStill.blockID)).generate(this.worldObj, this.rand, var12, var13, var14);
++            }
++
++            if(!var11 && this.rand.nextInt(8) == 0) {
++                var12 = var4 + this.rand.nextInt(16) + 8;
++                var10000 = this.rand;
++                Random var10001 = this.rand;
++                this.worldObj.getClass();
++                var13 = var10000.nextInt(var10001.nextInt(128 - 8) + 8);
++                var14 = var5 + this.rand.nextInt(16) + 8;
++                this.worldObj.getClass();
++                if(var13 < 63 || this.rand.nextInt(10) == 0) {
++                    (new WorldGenLakes(Block.lavaStill.blockID)).generate(this.worldObj, this.rand, var12, var13, var14);
++                }
++            }
++
++            for(var12 = 0; var12 < 8; ++var12) {
++                var13 = var4 + this.rand.nextInt(16) + 8;
++                var10000 = this.rand;
++                this.worldObj.getClass();
++                var14 = var10000.nextInt(128);
++                int var15 = var5 + this.rand.nextInt(16) + 8;
++                if((new WorldGenDungeons()).generate(this.worldObj, this.rand, var13, var14, var15)) {
++                }
++            }
++
++            var6.func_35477_a(this.worldObj, this.rand, var4, var5);
++            SpawnerAnimals.func_35957_a(this.worldObj, var6, var4 + 8, var5 + 8, 16, 16, this.rand);
++            BlockSand.fallInstantly = false;
++        } else {
++            super.populate(var1, var2, var3);
++        }
++    }
++}
+--- /dev/null
++++ net/minecraft/src/mod_SkylandsPortal.java
+@@ -1,0 +1,135 @@
++package net.minecraft.src;
++
++import net.minecraft.client.Minecraft;
++import org.lwjgl.opengl.GL11;
++import sapi.IInterceptBlockSet;
++import sapi.Loc;
++import sapi.SAPI;
++
++import javax.imageio.ImageIO;
++
++import static net.minecraft.src.Block.soundGlassFootstep;
++
++public class mod_SkylandsPortal extends BaseMod implements IInterceptBlockSet {
++    public static Block skylandsPortal;
++    public static Block altAir;
++
++    public static Item goldenStick;
++    public static Item magicWand;
++
++    public mod_SkylandsPortal() {
++        SkylandsPortalConfig.loadConfig();
++
++        if(isGuiAPILoaded()) {
++            new SkylandsPortalGuiAPI();
++        }
++
++        ModLoader.getMinecraftInstance().entityRenderer = new SPEntityRendererProxy(ModLoader.getMinecraftInstance());
++        skylandsPortal = new BlockSkylandsPortal(SkylandsPortalConfig.skylandsPortalBlockId, ModLoader.addOverride("/terrain.png", "/skylandsportal/alt_air.png")).setHardness(-1.0F).setStepSound(soundGlassFootstep).setLightValue(12.0F / 16.0F).setBlockName("skylandsPortal");
++        altAir = new BlockAltAir(SkylandsPortalConfig.altAirBlockId, ModLoader.addOverride("/terrain.png", "/skylandsportal/alt_air.png"), Material.air);
++        ModLoader.RegisterBlock(skylandsPortal);
++        ModLoader.RegisterBlock(altAir);
++        ModLoader.AddName(skylandsPortal, "Skylands Portal");
++
++        goldenStick = new Item(SkylandsPortalConfig.goldenStickItemId).setIconIndex(ModLoader.addOverride("/gui/items.png", "/skylandsportal/golden_stick.png")).setItemName("goldenStick");
++        magicWand = new ItemMagicWand(SkylandsPortalConfig.magicWandItemId).setIconIndex(ModLoader.addOverride("/gui/items.png", "/skylandsportal/magic_wand.png")).setItemName("magicWand");
++        ModLoader.AddName(goldenStick, "Golden Stick");
++        ModLoader.AddName(magicWand, "Magic Wand of Skylands");
++
++        ModLoader.AddShapelessRecipe(new ItemStack(goldenStick, 1), Item.stick, Item.ingotGold);
++        ModLoader.AddRecipe(new ItemStack(magicWand, 1), "odo", "oso", "oso", 's', new ItemStack(goldenStick), 'd', new ItemStack(Item.diamond));
++
++        try {
++            ModLoader.getMinecraftInstance().renderEngine.registerTextureFX(new TextureSkylandsPortalFX(skylandsPortal.blockIndexInTexture, 1, 0, ImageIO.read(Minecraft.class.getResource("/skylandsportal/skylands_portal.png")), 1));
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++
++        new DimensionSkylands();
++        SAPI.interceptAdd(this);
++        ModLoader.SetInGameHook(this, true, false);
++    }
++
++    public String Version() {
++        return "v1.1.1-b1.8.1";
++    }
++
++    public boolean OnTickInGame(float ticks, Minecraft game) {
++        float var16 = game.thePlayer.prevTimeInPortal + (game.thePlayer.timeInPortal - game.thePlayer.prevTimeInPortal) * ticks;
++        if(var16 > 0.0F && game.thePlayer.portal == 1) {
++            GL11.glEnable(GL11.GL_BLEND);
++            ScaledResolution var19 = new ScaledResolution(game.gameSettings, game.displayWidth, game.displayHeight);
++            int var23 = var19.getScaledWidth();
++            int var22 = var19.getScaledHeight();
++            this.renderSkylandsPortalOverlay(game, var16, var23, var22);
++            GL11.glDisable(GL11.GL_BLEND);
++        }
++        return true;
++    }
++
++    private void renderSkylandsPortalOverlay(Minecraft mc, float var1, int var2, int var3) {
++        if(var1 < 1.0F) {
++            var1 *= var1;
++            var1 *= var1;
++            var1 = var1 * 0.8F + 0.2F;
++        }
++
++        GL11.glDisable(GL11.GL_ALPHA_TEST);
++        GL11.glDisable(GL11.GL_DEPTH_TEST);
++        GL11.glDepthMask(false);
++        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
++        GL11.glColor4f(1.0F, 1.0F, 1.0F, var1);
++        GL11.glBindTexture(GL11.GL_TEXTURE_2D, mc.renderEngine.getTexture("/terrain.png"));
++        float var4 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture % 16) / 16.0F;
++        float var5 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture / 16) / 16.0F;
++        float var6 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture % 16 + 1) / 16.0F;
++        float var7 = (float)(mod_SkylandsPortal.skylandsPortal.blockIndexInTexture / 16 + 1) / 16.0F;
++        Tessellator var8 = Tessellator.instance;
++        var8.startDrawingQuads();
++        var8.addVertexWithUV(0.0D, (double)var3, -90.0D, (double)var4, (double)var7);
++        var8.addVertexWithUV((double)var2, (double)var3, -90.0D, (double)var6, (double)var7);
++        var8.addVertexWithUV((double)var2, 0.0D, -90.0D, (double)var6, (double)var5);
++        var8.addVertexWithUV(0.0D, 0.0D, -90.0D, (double)var4, (double)var5);
++        var8.draw();
++        GL11.glDepthMask(true);
++        GL11.glEnable(GL11.GL_DEPTH_TEST);
++        GL11.glEnable(GL11.GL_ALPHA_TEST);
++        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
++    }
++
++    public boolean canIntercept(World var1, Loc var2, int var3) {
++        if (var1.worldProvider.worldType != -1 && var3 == altAir.blockID) {
++            return true;
++        }
++
++        return false;
++    }
++
++    public int intercept(World var1, Loc var2, int var3) {
++        if (var3 == altAir.blockID) {
++            if (var1.getBlockId(var2.x(), var2.y() - 1, var2.z()) == Block.blockGold.blockID && ((BlockSkylandsPortal) skylandsPortal).tryToCreatePortal(var1, var2.x(), var2.y(), var2.z())) {
++                if (var1.worldProvider.worldType == 0 && var1.getSavedLightValue(EnumSkyBlock.Sky, var2.x(), var2.y(), var2.z()) > 12) {
++                    var1.entityJoinedWorld(new EntitySkylandsLightningBolt(var1, var2.x(), var2.y(), var2.z()));
++                }
++
++                return skylandsPortal.blockID;
++            }
++        }
++
++        return var3;
++    }
++
++    private static boolean isGuiAPILoaded() {
++        try {
++            Class.forName("GuiApiHelper");
++            return true;
++        } catch (ClassNotFoundException e) {
++            try {
++                Class.forName("net.minecraft.src.GuiApiHelper");
++                return true;
++            } catch (ClassNotFoundException e1) {
++                return false;
++            }
++        }
++    }
++}
+--- /dev/null
++++ net/minecraft/src/TeleporterSkylands.java
+@@ -1,0 +1,262 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class TeleporterSkylands extends Teleporter {
++    private Random random = new Random();
++
++    public boolean placeInExistingPortal(World var1, Entity var2) {
++        short var3 = 128;
++        double var4 = -1.0D;
++        int var6 = 0;
++        int var7 = 0;
++        int var8 = 0;
++        int var9 = MathHelper.floor_double(var2.posX);
++        int var10 = MathHelper.floor_double(var2.posZ);
++
++        double var18;
++        for(int var11 = var9 - var3; var11 <= var9 + var3; ++var11) {
++            double var12 = (double)var11 + 0.5D - var2.posX;
++
++            for(int var14 = var10 - var3; var14 <= var10 + var3; ++var14) {
++                double var15 = (double)var14 + 0.5D - var2.posZ;
++
++                for(int var17 = 128 - 1; var17 >= 0; --var17) {
++                    if(var1.getBlockId(var11, var17, var14) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                        while(var1.getBlockId(var11, var17 - 1, var14) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                            --var17;
++                        }
++
++                        var18 = (double)var17 + 0.5D - var2.posY;
++                        double var20 = var12 * var12 + var18 * var18 + var15 * var15;
++                        if(var4 < 0.0D || var20 < var4) {
++                            var4 = var20;
++                            var6 = var11;
++                            var7 = var17;
++                            var8 = var14;
++                        }
++                    }
++                }
++            }
++        }
++
++        if(var4 >= 0.0D) {
++            double var22 = (double)var6 + 0.5D;
++            double var16 = (double)var7 + 0.5D;
++            var18 = (double)var8 + 0.5D;
++            if(var1.getBlockId(var6 - 1, var7, var8) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var22 -= 0.5D;
++            }
++
++            if(var1.getBlockId(var6 + 1, var7, var8) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var22 += 0.5D;
++            }
++
++            if(var1.getBlockId(var6, var7, var8 - 1) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var18 -= 0.5D;
++            }
++
++            if(var1.getBlockId(var6, var7, var8 + 1) == mod_SkylandsPortal.skylandsPortal.blockID) {
++                var18 += 0.5D;
++            }
++
++            var2.setLocationAndAngles(var22, var16, var18, var2.rotationYaw, 0.0F);
++            var2.motionX = var2.motionY = var2.motionZ = 0.0D;
++            return true;
++        } else {
++            return false;
++        }
++    }
++
++    public boolean createPortal(World var1, Entity var2) {
++        byte var3 = 16;
++        double var4 = -1.0D;
++        int var6 = MathHelper.floor_double(var2.posX);
++        int var7 = MathHelper.floor_double(var2.posY);
++        int var8 = MathHelper.floor_double(var2.posZ);
++        int var9 = var6;
++        int var10 = var7;
++        int var11 = var8;
++        int var12 = 0;
++        int var13 = this.random.nextInt(4);
++
++        int var14;
++        double var15;
++        int var17;
++        double var18;
++        int var20;
++        int var21;
++        int var22;
++        int var23;
++        int var24;
++        int var25;
++        int var26;
++        int var27;
++        int var28;
++        double var32;
++        double var33;
++        for(var14 = var6 - var3; var14 <= var6 + var3; ++var14) {
++            var15 = (double)var14 + 0.5D - var2.posX;
++
++            for(var17 = var8 - var3; var17 <= var8 + var3; ++var17) {
++                var18 = (double)var17 + 0.5D - var2.posZ;
++
++                label296:
++                for(var20 = 128 - 1; var20 >= 0; --var20) {
++                    if(var1.isAirBlock(var14, var20, var17)) {
++                        while(var20 > 0 && var1.isAirBlock(var14, var20 - 1, var17)) {
++                            --var20;
++                        }
++
++                        for(var21 = var13; var21 < var13 + 4; ++var21) {
++                            var22 = var21 % 2;
++                            var23 = 1 - var22;
++                            if(var21 % 4 >= 2) {
++                                var22 = -var22;
++                                var23 = -var23;
++                            }
++
++                            for(var24 = 0; var24 < 3; ++var24) {
++                                for(var25 = 0; var25 < 4; ++var25) {
++                                    for(var26 = -1; var26 < 4; ++var26) {
++                                        var27 = var14 + (var25 - 1) * var22 + var24 * var23;
++                                        var28 = var20 + var26;
++                                        int var29 = var17 + (var25 - 1) * var23 - var24 * var22;
++                                        if(var26 < 0 && !this.blockIsGood(var1.getBlockId(var27, var28, var29))) {
++                                            continue label296;
++                                        }
++                                    }
++                                }
++                            }
++
++                            var32 = (double)var20 + 0.5D - var2.posY;
++                            var33 = var15 * var15 + var32 * var32 + var18 * var18;
++                            if(var4 < 0.0D || var33 < var4) {
++                                var4 = var33;
++                                var9 = var14;
++                                var10 = var20;
++                                var11 = var17;
++                                var12 = var21 % 4;
++                            }
++                        }
++                    }
++                }
++            }
++        }
++
++        if(var4 < 0.0D) {
++            for(var14 = var6 - var3; var14 <= var6 + var3; ++var14) {
++                var15 = (double)var14 + 0.5D - var2.posX;
++
++                for(var17 = var8 - var3; var17 <= var8 + var3; ++var17) {
++                    var18 = (double)var17 + 0.5D - var2.posZ;
++
++                    label234:
++                    for(var20 = 128 - 1; var20 >= 0; --var20) {
++                        if(var1.isAirBlock(var14, var20, var17)) {
++                            while(var20 > 0 && var1.isAirBlock(var14, var20 - 1, var17)) {
++                                --var20;
++                            }
++
++                            for(var21 = var13; var21 < var13 + 2; ++var21) {
++                                var22 = var21 % 2;
++                                var23 = 1 - var22;
++
++                                for(var24 = 0; var24 < 4; ++var24) {
++                                    for(var25 = -1; var25 < 4; ++var25) {
++                                        var26 = var14 + (var24 - 1) * var22;
++                                        var27 = var20 + var25;
++                                        var28 = var17 + (var24 - 1) * var23;
++                                        if(var25 < 0 && !this.blockIsGood(var1.getBlockId(var26, var27, var28))) {
++                                            continue label234;
++                                        }
++                                    }
++                                }
++
++                                var32 = (double)var20 + 0.5D - var2.posY;
++                                var33 = var15 * var15 + var32 * var32 + var18 * var18;
++                                if(var4 < 0.0D || var33 < var4) {
++                                    var4 = var33;
++                                    var9 = var14;
++                                    var10 = var20;
++                                    var11 = var17;
++                                    var12 = var21 % 2;
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++        }
++
++        int var30 = var9;
++        int var16 = var10;
++        var17 = var11;
++        int var31 = var12 % 2;
++        int var19 = 1 - var31;
++        if(var12 % 4 >= 2) {
++            var31 = -var31;
++            var19 = -var19;
++        }
++
++        boolean var34;
++        if(var4 < 0.0D) {
++            if(var10 < 70) {
++                var10 = 70;
++            }
++
++            if(var10 > 128 - 10) {
++                var10 = 128 - 10;
++            }
++
++            var16 = var10;
++
++            for(var20 = -1; var20 <= 1; ++var20) {
++                for(var21 = 1; var21 < 3; ++var21) {
++                    for(var22 = -1; var22 < 3; ++var22) {
++                        var23 = var30 + (var21 - 1) * var31 + var20 * var19;
++                        var24 = var16 + var22;
++                        var25 = var17 + (var21 - 1) * var19 - var20 * var31;
++                        var34 = var22 < 0;
++                        var1.setBlockWithNotify(var23, var24, var25, var34 ? Block.blockGold.blockID : 0);
++                    }
++                }
++            }
++        }
++
++        for(var20 = 0; var20 < 4; ++var20) {
++            var1.editingBlocks = true;
++
++            for(var21 = 0; var21 < 4; ++var21) {
++                for(var22 = -1; var22 < 4; ++var22) {
++                    var23 = var30 + (var21 - 1) * var31;
++                    var24 = var16 + var22;
++                    var25 = var17 + (var21 - 1) * var19;
++                    var34 = var21 == 0 || var21 == 3 || var22 == -1 || var22 == 3;
++                    var1.setBlockWithNotify(var23, var24, var25, var34 ? Block.blockGold.blockID : mod_SkylandsPortal.skylandsPortal.blockID);
++                }
++            }
++
++            var1.editingBlocks = false;
++
++            for(var21 = 0; var21 < 4; ++var21) {
++                for(var22 = -1; var22 < 4; ++var22) {
++                    var23 = var30 + (var21 - 1) * var31;
++                    var24 = var16 + var22;
++                    var25 = var17 + (var21 - 1) * var19;
++                    var1.notifyBlocksOfNeighborChange(var23, var24, var25, var1.getBlockId(var23, var24, var25));
++                }
++            }
++        }
++
++        return true;
++    }
++
++    public boolean blockIsGood(int blockId) {
++        if (blockId == 0) {
++            return false;
++        }
++
++        return Block.blocksList[blockId].renderAsNormalBlock() && Block.blocksList[blockId].isOpaqueCube();
++    }
++}
+--- /dev/null
++++ net/minecraft/src/SkylandsPortalGuiAPI.java
+@@ -1,0 +1,75 @@
++package net.minecraft.src;
++
++public class SkylandsPortalGuiAPI {
++    public static SettingBoolean overworldBiomeInSky;
++
++    public static SettingInt skylandsPortalBlockId;
++    public static SettingInt altAirBlockId;
++
++    public static SettingInt goldenStickItemId;
++    public static SettingInt magicWandItemId;
++
++    public SkylandsPortalGuiAPI() {
++        ModSettings skylandsPortalSettings = new ModSettings("skylandsportal");
++        ModSettingScreen skylandsPortalSettingScreen = new ModSettingScreen("Skylands Portal");
++
++        skylandsPortalSettings.append(overworldBiomeInSky = new SettingBoolean("overworldBiomesInSky", false));
++        skylandsPortalSettings.append(altAirBlockId = new SettingInt("altAirBlockId", 200, 110, 255));
++        skylandsPortalSettings.append(skylandsPortalBlockId = new SettingInt("skylandsPortalBlockId", 201, 110, 255));
++        skylandsPortalSettings.append(goldenStickItemId = new SettingInt("goldenStickItemId", 10000, 113, 31999));
++        skylandsPortalSettings.append(magicWandItemId = new SettingInt("magicWandItemId", 10001, 113, 31999));
++
++        WidgetBoolean overworldBiomeInSkyWidget = new WidgetBoolean(overworldBiomeInSky, "Overworld Biomes In Sky");
++        overworldBiomeInSkyWidget.addCallback(new ModAction(this, "setOverworldBiomesInSky"));
++
++        WidgetInt altAirWidget = new WidgetInt(altAirBlockId, "Alt Air Id");
++        altAirWidget.addCallback(new ModAction(this, "setAltAirBlockId"));
++
++        WidgetInt skylandsPortalWidget = new WidgetInt(skylandsPortalBlockId, "Sky Portal Id");
++        skylandsPortalWidget.addCallback(new ModAction(this, "setSkylandsPortalBlockId"));
++
++        WidgetInt goldenStickWidget = new WidgetInt(goldenStickItemId, "Golden Stick Id");
++        goldenStickWidget.addCallback(new ModAction(this, "setGoldenStickItemId"));
++
++        WidgetInt magicWandWidget = new WidgetInt(magicWandItemId, "Magic Wand Id");
++        magicWandWidget.addCallback(new ModAction(this, "setMagicWandItemId"));
++
++        skylandsPortalSettingScreen.append(overworldBiomeInSkyWidget);
++        skylandsPortalSettingScreen.append(altAirWidget);
++        skylandsPortalSettingScreen.append(skylandsPortalWidget);
++        skylandsPortalSettingScreen.append(goldenStickWidget);
++        skylandsPortalSettingScreen.append(magicWandWidget);
++        skylandsPortalSettings.load();
++
++        overworldBiomeInSky.set(SkylandsPortalConfig.overworldBiomesInSky);
++        altAirBlockId.set(SkylandsPortalConfig.altAirBlockId);
++        skylandsPortalBlockId.set(SkylandsPortalConfig.skylandsPortalBlockId);
++        goldenStickItemId.set(SkylandsPortalConfig.goldenStickItemId);
++        magicWandItemId.set(SkylandsPortalConfig.magicWandItemId);
++    }
++
++    private void setOverworldBiomesInSky() {
++        SkylandsPortalConfig.overworldBiomesInSky = overworldBiomeInSky.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setAltAirBlockId() {
++        SkylandsPortalConfig.altAirBlockId = altAirBlockId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setSkylandsPortalBlockId() {
++        SkylandsPortalConfig.skylandsPortalBlockId = skylandsPortalBlockId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setGoldenStickItemId() {
++        SkylandsPortalConfig.goldenStickItemId = goldenStickItemId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++
++    private void setMagicWandItemId() {
++        SkylandsPortalConfig.magicWandItemId = magicWandItemId.get();
++        SkylandsPortalConfig.saveConfig();
++    }
++}
+--- /dev/null
++++ net/minecraft/src/EntitySkylandsLightningBolt.java
+@@ -1,0 +1,38 @@
++package net.minecraft.src;
++
++public class EntitySkylandsLightningBolt extends EntityLightningBolt {
++    private int lightningState;
++    private int boltLivingTime;
++
++    public EntitySkylandsLightningBolt(World var1, double var2, double var4, double var6) {
++        super(var1, var2, var4, var6);
++        this.lightningState = 2;
++        this.boltLivingTime = this.rand.nextInt(3) + 1;
++    }
++
++    public void onUpdate() {
++        if (this.lightningState == 2) {
++            this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "ambient.weather.thunder", 10000.0F, 0.8F + this.rand.nextFloat() * 0.2F);
++            this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "random.explode", 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
++        }
++
++        --this.lightningState;
++        if (this.lightningState < 0) {
++            if (this.boltLivingTime == 0) {
++                this.setEntityDead();
++            } else if (this.lightningState < -this.rand.nextInt(10)) {
++                --this.boltLivingTime;
++                this.lightningState = 1;
++            }
++        }
++
++        if (this.lightningState >= 0) {
++            this.worldObj.field_27172_i = 2;
++        }
++
++    }
++
++    public boolean isInRangeToRenderVec3D(Vec3D var1) {
++        return this.lightningState >= 0;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/BlockSkylandsPortal.java
+@@ -1,0 +1,176 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class BlockSkylandsPortal extends BlockPortal {
++    public BlockSkylandsPortal(int var1, int var2) {
++        super(var1, var2);
++    }
++
++    public boolean tryToCreatePortal(World var1, int var2, int var3, int var4) {
++        byte var5 = 0;
++        byte var6 = 0;
++        if(var1.getBlockId(var2 - 1, var3, var4) == Block.blockGold.blockID || var1.getBlockId(var2 + 1, var3, var4) == Block.blockGold.blockID) {
++            var5 = 1;
++        }
++
++        if(var1.getBlockId(var2, var3, var4 - 1) == Block.blockGold.blockID || var1.getBlockId(var2, var3, var4 + 1) == Block.blockGold.blockID) {
++            var6 = 1;
++        }
++
++        if(var5 == var6) {
++            return false;
++        } else {
++            if(var1.getBlockId(var2 - var5, var3, var4 - var6) == 0) {
++                var2 -= var5;
++                var4 -= var6;
++            }
++
++            int var7;
++            int var8;
++            for(var7 = -1; var7 <= 2; ++var7) {
++                for(var8 = -1; var8 <= 3; ++var8) {
++                    boolean var9 = var7 == -1 || var7 == 2 || var8 == -1 || var8 == 3;
++                    if(var7 != -1 && var7 != 2 || var8 != -1 && var8 != 3) {
++                        int var10 = var1.getBlockId(var2 + var5 * var7, var3 + var8, var4 + var6 * var7);
++                        if(var9) {
++                            if(var10 != Block.blockGold.blockID) {
++                                return false;
++                            }
++                        } else if(var10 != 0 && var10 != mod_SkylandsPortal.altAir.blockID) {
++                            return false;
++                        }
++                    }
++                }
++            }
++
++            var1.editingBlocks = true;
++
++            for(var7 = 0; var7 < 2; ++var7) {
++                for(var8 = 0; var8 < 3; ++var8) {
++                    var1.setBlockWithNotify(var2 + var5 * var7, var3 + var8, var4 + var6 * var7, mod_SkylandsPortal.skylandsPortal.blockID);
++                }
++            }
++
++            var1.editingBlocks = false;
++            return true;
++        }
++    }
++
++    public boolean isValidPortalFrame(World world, int x, int y, int z) {
++        byte offsetX = 0;
++        byte offsetZ = 0;
++
++        if (world.getBlockId(x - 1, y, z) == Block.blockGold.blockID || world.getBlockId(x + 1, y, z) == Block.blockGold.blockID) {
++            offsetX = 1;
++        }
++
++        if (world.getBlockId(x, y, z - 1) == Block.blockGold.blockID || world.getBlockId(x, y, z + 1) == Block.blockGold.blockID) {
++            offsetZ = 1;
++        }
++
++        if (offsetX == offsetZ) {
++            return false;
++        }
++
++        if (world.getBlockId(x - offsetX, y, z - offsetZ) == 0) {
++            x -= offsetX;
++            z -= offsetZ;
++        }
++
++        for (int dx = -1; dx <= 2; dx++) {
++            for (int dy = -1; dy <= 3; dy++) {
++                boolean isFrame = dx == -1 || dx == 2 || dy == -1 || dy == 3;
++                int checkX = x + offsetX * dx;
++                int checkY = y + dy;
++                int checkZ = z + offsetZ * dx;
++
++                int blockId = world.getBlockId(checkX, checkY, checkZ);
++
++                if (isFrame) {
++                    if (blockId != Block.blockGold.blockID) {
++                        return false;
++                    }
++                } else {
++                    if (blockId != 0 && blockId != mod_SkylandsPortal.altAir.blockID) {
++                        return false;
++                    }
++                }
++            }
++        }
++
++        return true;
++    }
++
++    public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
++        byte var6 = 0;
++        byte var7 = 1;
++        if(var1.getBlockId(var2 - 1, var3, var4) == this.blockID || var1.getBlockId(var2 + 1, var3, var4) == this.blockID) {
++            var6 = 1;
++            var7 = 0;
++        }
++
++        int var8;
++        for(var8 = var3; var1.getBlockId(var2, var8 - 1, var4) == this.blockID; --var8) {
++        }
++
++        if(var1.getBlockId(var2, var8 - 1, var4) != Block.blockGold.blockID) {
++            var1.setBlockWithNotify(var2, var3, var4, 0);
++        } else {
++            int var9;
++            for(var9 = 1; var9 < 4 && var1.getBlockId(var2, var8 + var9, var4) == this.blockID; ++var9) {
++            }
++
++            if(var9 == 3 && var1.getBlockId(var2, var8 + var9, var4) == Block.blockGold.blockID) {
++                boolean var10 = var1.getBlockId(var2 - 1, var3, var4) == this.blockID || var1.getBlockId(var2 + 1, var3, var4) == this.blockID;
++                boolean var11 = var1.getBlockId(var2, var3, var4 - 1) == this.blockID || var1.getBlockId(var2, var3, var4 + 1) == this.blockID;
++                if(var10 && var11) {
++                    var1.setBlockWithNotify(var2, var3, var4, 0);
++                } else if((var1.getBlockId(var2 + var6, var3, var4 + var7) != Block.blockGold.blockID || var1.getBlockId(var2 - var6, var3, var4 - var7) != this.blockID) && (var1.getBlockId(var2 - var6, var3, var4 - var7) != Block.blockGold.blockID || var1.getBlockId(var2 + var6, var3, var4 + var7) != this.blockID)) {
++                    var1.setBlockWithNotify(var2, var3, var4, 0);
++                }
++            } else {
++                var1.setBlockWithNotify(var2, var3, var4, 0);
++            }
++        }
++    }
++
++    public void onEntityCollidedWithBlock(World var1, int var2, int var3, int var4, Entity var5) {
++        if(var5 instanceof EntityPlayerSP) {
++            EntityPlayerSP player = (EntityPlayerSP)var5;
++            player.setInPortal();
++            player.portal = 1;
++        }
++
++    }
++
++    public void randomDisplayTick(World var1, int var2, int var3, int var4, Random var5) {
++        if(var5.nextInt(100) == 0) {
++            var1.playSoundEffect((double)var2 + 0.5D, (double)var3 + 0.5D, (double)var4 + 0.5D, "portal.portal", 1.0F, var5.nextFloat() * 0.4F + 0.8F);
++        }
++
++        for(int var6 = 0; var6 < 4; ++var6) {
++            double var7 = (double)((float)var2 + var5.nextFloat());
++            double var9 = (double)((float)var3 + var5.nextFloat());
++            double var11 = (double)((float)var4 + var5.nextFloat());
++            double var13 = 0.0D;
++            double var15 = 0.0D;
++            double var17 = 0.0D;
++            int var19 = var5.nextInt(2) * 2 - 1;
++            var13 = ((double)var5.nextFloat() - 0.5D) * 0.5D;
++            var15 = ((double)var5.nextFloat() - 0.5D) * 0.5D;
++            var17 = ((double)var5.nextFloat() - 0.5D) * 0.5D;
++            if(var1.getBlockId(var2 - 1, var3, var4) != this.blockID && var1.getBlockId(var2 + 1, var3, var4) != this.blockID) {
++                var7 = (double)var2 + 0.5D + 0.25D * (double)var19;
++                var13 = (double)(var5.nextFloat() * 2.0F * (float)var19);
++            } else {
++                var11 = (double)var4 + 0.5D + 0.25D * (double)var19;
++                var17 = (double)(var5.nextFloat() * 2.0F * (float)var19);
++            }
++
++            EntityPortalFX skylandsPortalParticle = new EntitySkylandsPortalFX(var1, var7, var9, var11, var13, var15, var17);
++            ModLoader.getMinecraftInstance().effectRenderer.addEffect(skylandsPortalParticle);
++        }
++
++    }
++}
+--- /dev/null
++++ net/minecraft/src/TextureSkylandsPortalFX.java
+@@ -1,0 +1,9 @@
++package net.minecraft.src;
++
++import java.awt.image.BufferedImage;
++
++public class TextureSkylandsPortalFX extends ModTextureAnimation {
++	public TextureSkylandsPortalFX(int slot, int size, int dst, BufferedImage source, int rate) {
++		super(slot, size, dst, source, rate);
++	}
++}
+--- /dev/null
++++ net/minecraft/src/SPEntityRendererProxy.java
+@@ -1,0 +1,472 @@
++package net.minecraft.src;
++
++import net.minecraft.client.Minecraft;
++import org.lwjgl.opengl.GL11;
++
++import java.lang.reflect.Field;
++import java.lang.reflect.Method;
++
++public class SPEntityRendererProxy extends EntityRendererProxy {
++    private Minecraft mc;
++
++    public SPEntityRendererProxy(Minecraft minecraft) {
++        super(minecraft);
++        this.mc = minecraft;
++    }
++
++    public void renderWorld(float var1, long var2) {
++        if (this.mc.thePlayer.dimension == 1) {
++            GL11.glEnable(GL11.GL_CULL_FACE);
++            GL11.glEnable(GL11.GL_DEPTH_TEST);
++            if (this.mc.renderViewEntity == null) {
++                this.mc.renderViewEntity = this.mc.thePlayer;
++            }
++
++            this.getMouseOver(var1);
++            EntityLiving var4 = this.mc.renderViewEntity;
++            RenderGlobal var5 = this.mc.renderGlobal;
++            EffectRenderer var6 = this.mc.effectRenderer;
++            double var7 = var4.lastTickPosX + (var4.posX - var4.lastTickPosX) * (double) var1;
++            double var9 = var4.lastTickPosY + (var4.posY - var4.lastTickPosY) * (double) var1;
++            double var11 = var4.lastTickPosZ + (var4.posZ - var4.lastTickPosZ) * (double) var1;
++            IChunkProvider var13 = this.mc.theWorld.getIChunkProvider();
++            int var16;
++            if (var13 instanceof ChunkProviderLoadOrGenerate) {
++                ChunkProviderLoadOrGenerate var14 = (ChunkProviderLoadOrGenerate) var13;
++                int var15 = MathHelper.floor_float((float) ((int) var7)) >> 4;
++                var16 = MathHelper.floor_float((float) ((int) var11)) >> 4;
++                var14.setCurrentChunkOver(var15, var16);
++            }
++
++            for (int var18 = 0; var18 < 2; ++var18) {
++                if (this.mc.gameSettings.anaglyph) {
++                    anaglyphField = var18;
++                    if (anaglyphField == 0) {
++                        GL11.glColorMask(false, true, true, false);
++                    } else {
++                        GL11.glColorMask(true, false, false, false);
++                    }
++                }
++
++                GL11.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
++                try {
++                    Method updateFogColor = EntityRenderer.class.getDeclaredMethod("g", float.class);
++                    updateFogColor.setAccessible(true);
++                    updateFogColor.invoke(this, var1);
++                } catch (Exception e) {
++                    try {
++                        Method updateFogColor = EntityRenderer.class.getDeclaredMethod("updateFogColor", float.class);
++                        updateFogColor.setAccessible(true);
++                        updateFogColor.invoke(this, var1);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_COLOR_BUFFER_BIT);
++                GL11.glEnable(GL11.GL_CULL_FACE);
++
++                try {
++                    Method setupCameraTransform = EntityRenderer.class.getDeclaredMethod("a", float.class, int.class);
++                    setupCameraTransform.setAccessible(true);
++                    setupCameraTransform.invoke(this, var1, var18);
++                } catch (Exception e) {
++                    try {
++                        Method setupCameraTransform = EntityRenderer.class.getDeclaredMethod("setupCameraTransform", float.class, int.class);
++                        setupCameraTransform.setAccessible(true);
++                        setupCameraTransform.invoke(this, var1, var18);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                ClippingHelperImpl.getInstance();
++                if (this.mc.gameSettings.renderDistance < 2) {
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, -1, var1);
++                    } catch (Exception e) {
++                        try {
++                            Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                            setupFog.setAccessible(true);
++                            setupFog.invoke(this, -1, var1);
++                        } catch (Exception e1) {
++                            e1.printStackTrace();
++                        }
++                    }
++                    this.renderSky(var1, var5);
++                }
++
++                GL11.glEnable(GL11.GL_FOG);
++                try {
++                    Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                    setupFog.setAccessible(true);
++                    setupFog.invoke(this, 1, var1);
++                } catch (Exception e) {
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, 1, var1);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                if (this.mc.gameSettings.ambientOcclusion) {
++                    GL11.glShadeModel(GL11.GL_SMOOTH);
++                }
++
++                Frustrum var19 = new Frustrum();
++                var19.setPosition(var7, var9, var11);
++                this.mc.renderGlobal.clipRenderersByFrustrum(var19, var1);
++                if (var18 == 0) {
++                    while (!this.mc.renderGlobal.updateRenderers(var4, false) && var2 != 0L) {
++                        long var20 = var2 - System.nanoTime();
++                        if (var20 < 0L || var20 > 1000000000L) {
++                            break;
++                        }
++                    }
++                }
++
++                try {
++                    Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                    setupFog.setAccessible(true);
++                    setupFog.invoke(this, 0, var1);
++                } catch (Exception e) {
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, 0, var1);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                GL11.glEnable(GL11.GL_FOG);
++                GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/terrain.png"));
++                RenderHelper.disableStandardItemLighting();
++                var5.sortAndRender(var4, 0, (double) var1);
++                GL11.glShadeModel(GL11.GL_FLAT);
++                EntityPlayer var21;
++                if (this.field_35823_q == 0) {
++                    RenderHelper.enableStandardItemLighting();
++                    var5.renderEntities(var4.getPosition(var1), var19, var1);
++                    this.func_35806_b((double) var1);
++                    var6.func_1187_b(var4, var1);
++                    RenderHelper.disableStandardItemLighting();
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, 0, var1);
++                    } catch (Exception e) {
++                        try {
++                            Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                            setupFog.setAccessible(true);
++                            setupFog.invoke(this, 0, var1);
++                        } catch (Exception e1) {
++                            e1.printStackTrace();
++                        }
++                    }
++                    var6.renderParticles(var4, var1);
++                    this.func_35810_a((double) var1);
++                    if (this.mc.objectMouseOver != null && var4.isInsideOfMaterial(Material.water) && var4 instanceof EntityPlayer) {
++                        var21 = (EntityPlayer) var4;
++                        GL11.glDisable(GL11.GL_ALPHA_TEST);
++                        var5.drawBlockBreaking(var21, this.mc.objectMouseOver, 0, var21.inventory.getCurrentItem(), var1);
++                        var5.drawSelectionBox(var21, this.mc.objectMouseOver, 0, var21.inventory.getCurrentItem(), var1);
++                        GL11.glEnable(GL11.GL_ALPHA_TEST);
++                    }
++                }
++
++                GL11.glDisable(GL11.GL_BLEND);
++                GL11.glEnable(GL11.GL_CULL_FACE);
++                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
++                GL11.glDepthMask(true);
++                try {
++                    Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                    setupFog.setAccessible(true);
++                    setupFog.invoke(this, 0, var1);
++                } catch (Exception e) {
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, 0, var1);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                GL11.glEnable(GL11.GL_BLEND);
++                GL11.glDisable(GL11.GL_CULL_FACE);
++                GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/terrain.png"));
++                if (this.mc.gameSettings.fancyGraphics) {
++                    if (this.mc.gameSettings.ambientOcclusion) {
++                        GL11.glShadeModel(GL11.GL_SMOOTH);
++                    }
++
++                    GL11.glColorMask(false, false, false, false);
++                    var16 = var5.sortAndRender(var4, 1, (double) var1);
++                    if (this.mc.gameSettings.anaglyph) {
++                        if (anaglyphField == 0) {
++                            GL11.glColorMask(false, true, true, true);
++                        } else {
++                            GL11.glColorMask(true, false, false, true);
++                        }
++                    } else {
++                        GL11.glColorMask(true, true, true, true);
++                    }
++
++                    if (var16 > 0) {
++                        var5.renderAllRenderLists(1, (double) var1);
++                    }
++
++                    GL11.glShadeModel(GL11.GL_FLAT);
++                } else {
++                    var5.sortAndRender(var4, 1, (double) var1);
++                }
++
++                GL11.glDepthMask(true);
++                GL11.glEnable(GL11.GL_CULL_FACE);
++                GL11.glDisable(GL11.GL_BLEND);
++
++                double cameraZoom = 1.0D;
++                try {
++                    Field cameraZoom1 = EntityRenderer.class.getDeclaredField("Q");
++                    cameraZoom1.setAccessible(true);
++                    cameraZoom = (double) cameraZoom1.get(this);
++                } catch (Exception e) {
++                    try {
++                        Field cameraZoom1 = EntityRenderer.class.getDeclaredField("cameraZoom");
++                        cameraZoom1.setAccessible(true);
++                        cameraZoom = (double) cameraZoom1.get(this);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                if (cameraZoom == 1.0D && var4 instanceof EntityPlayer && this.mc.objectMouseOver != null && !var4.isInsideOfMaterial(Material.water)) {
++                    var21 = (EntityPlayer) var4;
++                    GL11.glDisable(GL11.GL_ALPHA_TEST);
++                    var5.drawBlockBreaking(var21, this.mc.objectMouseOver, 0, var21.inventory.getCurrentItem(), var1);
++                    var5.drawSelectionBox(var21, this.mc.objectMouseOver, 0, var21.inventory.getCurrentItem(), var1);
++                    GL11.glEnable(GL11.GL_ALPHA_TEST);
++                }
++
++                this.renderRainSnow(var1);
++                GL11.glDisable(GL11.GL_FOG);
++                GL11.glPushMatrix();
++                try {
++                    Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                    setupFog.setAccessible(true);
++                    setupFog.invoke(this, 0, var1);
++                } catch (Exception e) {
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, 0, var1);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                GL11.glEnable(GL11.GL_FOG);
++                var5.renderClouds(var1);
++                GL11.glDisable(GL11.GL_FOG);
++                try {
++                    Method setupFog = EntityRenderer.class.getDeclaredMethod("a", int.class, float.class);
++                    setupFog.setAccessible(true);
++                    setupFog.invoke(this, 1, var1);
++                } catch (Exception e) {
++                    try {
++                        Method setupFog = EntityRenderer.class.getDeclaredMethod("setupFog", int.class, float.class);
++                        setupFog.setAccessible(true);
++                        setupFog.invoke(this, 1, var1);
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++                GL11.glPopMatrix();
++                if (cameraZoom == 1.0D) {
++                    GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
++                    try {
++                        Method func_4135_b = EntityRenderer.class.getDeclaredMethod("b", float.class, int.class);
++                        func_4135_b.setAccessible(true);
++                        func_4135_b.invoke(this, var1, var18);
++                    } catch (Exception e) {
++                        try {
++                            Method func_4135_b = EntityRenderer.class.getDeclaredMethod("func_4135_b", float.class, int.class);
++                            func_4135_b.setAccessible(true);
++                            func_4135_b.invoke(this, var1, var18);
++                        } catch (Exception e1) {
++                            e1.printStackTrace();
++                        }
++                    }
++                }
++
++                if (!this.mc.gameSettings.anaglyph) {
++                    return;
++                }
++            }
++
++            GL11.glColorMask(true, true, true, false);
++        } else {
++            super.renderWorld(var1, var2);
++        }
++    }
++
++    public void renderSky(float var1, RenderGlobal renderGlobal) {
++        if(!this.mc.theWorld.worldProvider.isNether) {
++            GL11.glDisable(GL11.GL_TEXTURE_2D);
++            Vec3D var2 = this.mc.theWorld.getSkyColor(this.mc.renderViewEntity, var1);
++            float var3 = (float)var2.xCoord;
++            float var4 = (float)var2.yCoord;
++            float var5 = (float)var2.zCoord;
++            float var7;
++            float var8;
++            if(this.mc.gameSettings.anaglyph) {
++                float var6 = (var3 * 30.0F + var4 * 59.0F + var5 * 11.0F) / 100.0F;
++                var7 = (var3 * 30.0F + var4 * 70.0F) / 100.0F;
++                var8 = (var3 * 30.0F + var5 * 70.0F) / 100.0F;
++                var3 = var6;
++                var4 = var7;
++                var5 = var8;
++            }
++
++            GL11.glColor3f(var3, var4, var5);
++            Tessellator var16 = Tessellator.instance;
++            GL11.glDepthMask(false);
++            GL11.glEnable(GL11.GL_FOG);
++            GL11.glColor3f(var3, var4, var5);
++            try {
++                Field glSkyList = RenderGlobal.class.getDeclaredField("x");
++                glSkyList.setAccessible(true);
++                GL11.glCallList((int) glSkyList.get(renderGlobal));
++            } catch (Exception e) {
++                try {
++                    Field glSkyList = RenderGlobal.class.getDeclaredField("glSkyList");
++                    glSkyList.setAccessible(true);
++                    GL11.glCallList((int) glSkyList.get(renderGlobal));
++                } catch (Exception e1) {
++                    e1.printStackTrace();
++                }
++            }
++            GL11.glDisable(GL11.GL_FOG);
++            GL11.glDisable(GL11.GL_ALPHA_TEST);
++            GL11.glEnable(GL11.GL_BLEND);
++            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
++            RenderHelper.disableStandardItemLighting();
++            float[] var17 = this.mc.theWorld.worldProvider.calcSunriseSunsetColors(this.mc.theWorld.getCelestialAngle(var1), var1);
++            float var9;
++            float var10;
++            float var11;
++            float var12;
++            if(var17 != null) {
++                GL11.glDisable(GL11.GL_TEXTURE_2D);
++                GL11.glShadeModel(GL11.GL_SMOOTH);
++                GL11.glPushMatrix();
++                GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
++                GL11.glRotatef(MathHelper.sin(this.mc.theWorld.func_35456_d(var1)) < 0.0F ? 180.0F : 0.0F, 0.0F, 0.0F, 1.0F);
++                var8 = var17[0];
++                var9 = var17[1];
++                var10 = var17[2];
++                float var13;
++                if(this.mc.gameSettings.anaglyph) {
++                    var11 = (var8 * 30.0F + var9 * 59.0F + var10 * 11.0F) / 100.0F;
++                    var12 = (var8 * 30.0F + var9 * 70.0F) / 100.0F;
++                    var13 = (var8 * 30.0F + var10 * 70.0F) / 100.0F;
++                    var8 = var11;
++                    var9 = var12;
++                    var10 = var13;
++                }
++
++                var16.startDrawing(6);
++                var16.setColorRGBA_F(var8, var9, var10, var17[3]);
++                var16.addVertex(0.0D, 100.0D, 0.0D);
++                byte var19 = 16;
++                var16.setColorRGBA_F(var17[0], var17[1], var17[2], 0.0F);
++
++                for(int var20 = 0; var20 <= var19; ++var20) {
++                    var13 = (float)var20 * (float)Math.PI * 2.0F / (float)var19;
++                    float var14 = MathHelper.sin(var13);
++                    float var15 = MathHelper.cos(var13);
++                    var16.addVertex((double)(var14 * 120.0F), (double)(var15 * 120.0F), (double)(-var15 * 40.0F * var17[3]));
++                }
++
++                var16.draw();
++                GL11.glPopMatrix();
++                GL11.glShadeModel(GL11.GL_FLAT);
++            }
++
++            GL11.glEnable(GL11.GL_TEXTURE_2D);
++            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
++            GL11.glPushMatrix();
++            var7 = 1.0F - this.mc.theWorld.getRainStrength(var1);
++            var8 = 0.0F;
++            var9 = 0.0F;
++            var10 = 0.0F;
++            GL11.glColor4f(1.0F, 1.0F, 1.0F, var7);
++            GL11.glTranslatef(var8, var9, var10);
++            GL11.glRotatef(0.0F, 0.0F, 0.0F, 1.0F);
++            GL11.glRotatef(this.mc.theWorld.getCelestialAngle(var1) * 360.0F, 1.0F, 0.0F, 0.0F);
++            var11 = 30.0F;
++            GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/terrain/sun.png"));
++            var16.startDrawingQuads();
++            var16.addVertexWithUV((double)(-var11), 100.0D, (double)(-var11), 0.0D, 0.0D);
++            var16.addVertexWithUV((double)var11, 100.0D, (double)(-var11), 1.0D, 0.0D);
++            var16.addVertexWithUV((double)var11, 100.0D, (double)var11, 1.0D, 1.0D);
++            var16.addVertexWithUV((double)(-var11), 100.0D, (double)var11, 0.0D, 1.0D);
++            var16.draw();
++            var11 = 20.0F;
++            GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/terrain/moon.png"));
++            var16.startDrawingQuads();
++            var16.addVertexWithUV((double)(-var11), -100.0D, (double)var11, 1.0D, 1.0D);
++            var16.addVertexWithUV((double)var11, -100.0D, (double)var11, 0.0D, 1.0D);
++            var16.addVertexWithUV((double)var11, -100.0D, (double)(-var11), 0.0D, 0.0D);
++            var16.addVertexWithUV((double)(-var11), -100.0D, (double)(-var11), 1.0D, 0.0D);
++            var16.draw();
++            GL11.glDisable(GL11.GL_TEXTURE_2D);
++            var12 = this.mc.theWorld.getStarBrightness(var1) * var7;
++            if(var12 > 0.0F) {
++                GL11.glColor4f(var12, var12, var12, var12);
++                try {
++                    Field starGLCallList = RenderGlobal.class.getDeclaredField("w");
++                    starGLCallList.setAccessible(true);
++                    GL11.glCallList((int) starGLCallList.get(renderGlobal));
++                } catch (Exception e) {
++                    try {
++                        Field starGLCallList = RenderGlobal.class.getDeclaredField("starGLCallList");
++                        starGLCallList.setAccessible(true);
++                        GL11.glCallList((int) starGLCallList.get(renderGlobal));
++                    } catch (Exception e1) {
++                        e1.printStackTrace();
++                    }
++                }
++            }
++
++            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
++            GL11.glDisable(GL11.GL_BLEND);
++            GL11.glEnable(GL11.GL_ALPHA_TEST);
++            GL11.glEnable(GL11.GL_FOG);
++            GL11.glPopMatrix();
++            GL11.glDisable(GL11.GL_TEXTURE_2D);
++            GL11.glColor3f(0.0F, 0.0F, 0.0F);
++            if(this.mc.theWorld.worldProvider.func_28112_c()) {
++                GL11.glColor3f(var3 * 0.2F + 0.04F, var4 * 0.2F + 0.04F, var5 * 0.6F + 0.1F);
++            } else {
++                GL11.glColor3f(var3, var4, var5);
++            }
++
++            GL11.glPushMatrix();
++            try {
++                Field glSkyList2 = RenderGlobal.class.getDeclaredField("y");
++                glSkyList2.setAccessible(true);
++                GL11.glCallList((int) glSkyList2.get(renderGlobal));
++            } catch (Exception e) {
++                try {
++                    Field glSkyList2 = RenderGlobal.class.getDeclaredField("glSkyList2");
++                    glSkyList2.setAccessible(true);
++                    GL11.glCallList((int) glSkyList2.get(renderGlobal));
++                } catch (Exception e1) {
++                    e1.printStackTrace();
++                }
++            }
++            GL11.glPopMatrix();
++            GL11.glEnable(GL11.GL_TEXTURE_2D);
++            GL11.glDepthMask(true);
++        }
++    }
++}
+--- /dev/null
++++ net/minecraft/src/BlockAltAir.java
+@@ -1,0 +1,37 @@
++package net.minecraft.src;
++
++import java.util.Random;
++
++public class BlockAltAir extends Block {
++    protected BlockAltAir(int var1, int var2, Material var3) {
++        super(var1, var2, var3);
++    }
++
++    public AxisAlignedBB getCollisionBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
++        return null;
++    }
++
++    public boolean isOpaqueCube() {
++        return false;
++    }
++
++    public boolean renderAsNormalBlock() {
++        return false;
++    }
++
++    public void onBlockAdded(World var1, int var2, int var3, int var4){
++        var1.scheduleBlockUpdate(var2, var3, var4, this.blockID, 20);
++    }
++
++    public void updateTick(World var1, int var2, int var3, int var4, Random var5) {
++        var1.setBlock(var2, var3, var4, 0);
++    }
++
++    public int quantityDropped(Random var1) {
++        return 0;
++    }
++
++    public boolean isCollidable() {
++        return false;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/WorldProviderSkylands.java
+@@ -1,0 +1,21 @@
++package net.minecraft.src;
++
++public class WorldProviderSkylands extends WorldProviderSky {
++    public void registerWorldChunkManager() {
++        if (SkylandsPortalConfig.overworldBiomesInSky) {
++            this.worldChunkMgr = new WorldChunkManager(this.worldObj);
++        } else {
++            this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.sky, 0.5F, 0.0F);
++        }
++
++        this.worldType = 1;
++    }
++
++    public IChunkProvider getChunkProvider() {
++        return new ChunkProviderSkylands(this.worldObj, this.worldObj.getRandomSeed());
++    }
++
++    public boolean canRespawnHere() {
++        return false;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/SkylandsPortalConfig.java
+@@ -1,0 +1,78 @@
++package net.minecraft.src;
++
++import net.minecraft.client.Minecraft;
++
++import java.io.*;
++import java.util.Properties;
++
++public class SkylandsPortalConfig {
++	private static final File configFile = new File(Minecraft.getMinecraftDir(), "config/SkylandsPortal.cfg");
++	private static final LinkedProperties props = new LinkedProperties();
++
++	public static boolean overworldBiomesInSky = false;
++	public static int altAirBlockId = 200;
++	public static int skylandsPortalBlockId = 201;
++	public static int goldenStickItemId = 10000;
++	public static int magicWandItemId = 10001;
++
++	public static void loadConfig() {
++		try {
++			if (!configFile.exists()) {
++				configFile.getParentFile().mkdirs();
++				saveConfig();
++			}
++
++			FileInputStream in = new FileInputStream(configFile);
++			props.load(in);
++			in.close();
++
++			overworldBiomesInSky = Boolean.parseBoolean(props.getProperty("overworldBiomesInSky", "false"));
++			altAirBlockId = Integer.parseInt(props.getProperty("altAirBlockId", "200"));
++			skylandsPortalBlockId = Integer.parseInt(props.getProperty("skylandsPortalBlockId", "201"));
++			goldenStickItemId = Integer.parseInt(props.getProperty("goldenStickItemId", "10000"));
++			magicWandItemId = Integer.parseInt(props.getProperty("magicWandItemId", "10001"));
++		} catch (Exception e) {
++			e.printStackTrace();
++		}
++	}
++
++	public static void saveConfig() {
++		try {
++			props.clear();
++
++			props.setProperty("overworldBiomesInSky", String.valueOf(overworldBiomesInSky));
++			props.setProperty("altAirBlockId", String.valueOf(altAirBlockId));
++			props.setProperty("skylandsPortalBlockId", String.valueOf(skylandsPortalBlockId));
++			props.setProperty("goldenStickItemId", String.valueOf(goldenStickItemId));
++			props.setProperty("magicWandItemId", String.valueOf(magicWandItemId));
++
++			FileOutputStream out = new FileOutputStream(configFile);
++			storeWithoutTimestamp(props, out, "Skylands Portal Config");
++			out.close();
++		} catch (Exception e) {
++			e.printStackTrace();
++		}
++	}
++
++	private static void storeWithoutTimestamp(Properties props, OutputStream out, String comment) throws IOException {
++		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
++		if (comment != null && !comment.isEmpty()) {
++			writer.write("# " + comment);
++			writer.newLine();
++		}
++
++		for (Object keyObj : props.keySet()) {
++			String key = (String) keyObj;
++			String value = props.getProperty(key);
++
++			if (key.startsWith("#")) {
++				writer.newLine();
++				writer.write(key);
++			} else {
++				writer.write(key + "=" + value);
++			}
++			writer.newLine();
++		}
++		writer.flush();
++	}
++}
+--- /dev/null
++++ net/minecraft/src/ItemMagicWand.java
+@@ -1,0 +1,51 @@
++package net.minecraft.src;
++
++public class ItemMagicWand extends ItemFlintAndSteel {
++    public ItemMagicWand(int var1) {
++        super(var1);
++    }
++
++    public boolean onItemUse(ItemStack var1, EntityPlayer var2, World var3, int var4, int var5, int var6, int var7) {
++        if(var7 == 0) {
++            --var5;
++        }
++
++        if(var7 == 1) {
++            ++var5;
++        }
++
++        if(var7 == 2) {
++            --var6;
++        }
++
++        if(var7 == 3) {
++            ++var6;
++        }
++
++        if(var7 == 4) {
++            --var4;
++        }
++
++        if(var7 == 5) {
++            ++var4;
++        }
++
++        if (var2.dimension != -1) {
++            int var8 = var3.getBlockId(var4, var5, var6);
++            int var9 = var3.getBlockId(var4, var5 - 1, var6);
++            boolean var10 = ((BlockSkylandsPortal) mod_SkylandsPortal.skylandsPortal).isValidPortalFrame(var3, var4, var5, var6);
++
++            if (!var10) {
++                return false;
++            }
++
++            if (var8 == 0 && var9 == Block.blockGold.blockID) {
++                var3.setBlockWithNotify(var4, var5, var6, mod_SkylandsPortal.altAir.blockID);
++            }
++
++            var1.damageItem(65, var2);
++        }
++
++        return true;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/DimensionSkylands.java
+@@ -1,0 +1,16 @@
++package net.minecraft.src;
++
++import sapi.DimensionBase;
++import sapi.Loc;
++
++public class DimensionSkylands extends DimensionBase {
++    public DimensionSkylands() {
++        super(1, WorldProviderSkylands.class, TeleporterSkylands.class);
++        this.name = "Skylands";
++    }
++
++    public Loc getDistanceScale(Loc loc, boolean flag) {
++        double d = flag ? 8.0D : 0.125D;
++        return loc.multiply(d, 1.0D, d);
++    }
++}
+--- /dev/null
++++ net/minecraft/src/EntitySkylandsPortalFX.java
+@@ -1,0 +1,12 @@
++package net.minecraft.src;
++
++public class EntitySkylandsPortalFX extends EntityPortalFX {
++
++    public EntitySkylandsPortalFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12) {
++        super(var1, var2, var4, var6, var8, var10, var12);
++        float var14 = this.rand.nextFloat() * 0.6F + 0.4F;
++        this.particleRed = 0.39F * var14;
++        this.particleGreen = 0.71F * var14;
++        this.particleBlue = 0.98F * var14;
++    }
++}
+--- /dev/null
++++ net/minecraft/src/LinkedProperties.java
+@@ -1,0 +1,26 @@
++package net.minecraft.src;
++
++import java.util.*;
++
++public class LinkedProperties extends Properties {
++    private final List<Object> keys = new ArrayList<>();
++
++    @Override
++    public synchronized Object put(Object key, Object value) {
++        if (!keys.contains(key)) {
++            keys.add(key);
++        }
++        return super.put(key, value);
++    }
++
++    @Override
++    public Set<Object> keySet() {
++        return new LinkedHashSet<>(keys);
++    }
++
++    @Override
++    public synchronized Enumeration<Object> keys() {
++        return Collections.enumeration(keys);
++    }
++}
++

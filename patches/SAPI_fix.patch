@@ -1,0 +1,45 @@
+--- net/minecraft/src/SaveHandler.java
++++ net/minecraft/src/SaveHandler.java
+@@ -71,7 +71,7 @@
+ 
+ 	public IChunkLoader getChunkLoader(WorldProvider worldprovider) {
+ 		DimensionBase var2 = DimensionBase.getDimByProvider(worldprovider.getClass());
+-		if(worldprovider instanceof WorldProviderHell) {
++		if(var2.number != 0) {
+ 			File file = new File(this.saveDirectory, "DIM" + var2.number);
+ 			file.mkdirs();
+ 			return new ChunkLoader(file, true);
+--- net/minecraft/src/EntityPlayerSP.java
++++ net/minecraft/src/EntityPlayerSP.java
+@@ -33,7 +33,6 @@
+ 
+ 		this.username = session.username;
+ 		this.playerBases = new ArrayList();
+-		sapi = null;
+ 		this.portal = -1;
+ 		if(sapi == null) {
+ 			sapi = new SAPI();
+@@ -491,9 +490,9 @@
+ 		this.isJumping = flag;
+ 	}
+ 
+-	public float getEntityBrightness(float f) {
+-		return sapi.PAPIgetEntityBrightness(this, f, super.getEntityBrightness(f));
+-	}
++//	public float getEntityBrightness(float f) {
++//		return sapi.PAPIgetEntityBrightness(this, f, super.getEntityBrightness(f));
++//	}
+ 
+ 	public void onUpdate() {
+ 		sapi.PAPIbeforeUpdate(this);
+--- net/minecraft/src/SaveOldDir.java
++++ net/minecraft/src/SaveOldDir.java
+@@ -12,7 +12,7 @@
+ 	public IChunkLoader getChunkLoader(WorldProvider worldprovider) {
+ 		DimensionBase var2 = DimensionBase.getDimByProvider(worldprovider.getClass());
+ 		File file = this.getSaveDirectory();
+-		if(worldprovider instanceof WorldProviderHell) {
++		if(var2.number != 0) {
+ 			File file1 = new File(file, "DIM" + var2.number);
+ 			file1.mkdirs();
+ 			return new McRegionChunkLoader(file1);
