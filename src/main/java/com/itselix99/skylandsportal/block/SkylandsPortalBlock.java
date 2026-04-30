@@ -191,7 +191,7 @@ public class SkylandsPortalBlock extends TemplateNetherPortalBlock implements Cu
     }
 
     public double getDimensionScale(PlayerEntity player) {
-        return 8.0D;
+        return 0.125D;
     }
 
     public PortalForcer getTravelAgent(PlayerEntity player) {
