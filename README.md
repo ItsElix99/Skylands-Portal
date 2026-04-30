@@ -20,7 +20,7 @@ The Magic Wand of Skylands is crafted using 2 Golden Sticks and 1 Diamond. It is
 #### for b1.8.1
 * [ModLoader](https://mcarchive.net/mods/modloader?gvsn=b1.8.1)
 * [ShockAhPI r9](https://mcarchive.net/mods/shockahpi?gvsn=b1.8.1)
-* ShockAhPI r9 fix
+* [ShockAhPI r9 fix](https://github.com/ItsElix99/Skylands-Portal/raw/refs/heads/b1.8.1-ml/ShockAhPI%20r9%20fix.zip)
 * [GuiAPI](https://mcarchive.net/mods/guiapi?gvsn=b1.8.1) (Optional, for in-game configuration)
 #### for b1.7.3
 * [ModLoader](https://mcarchive.net/mods/modloader?gvsn=b1.7.3)
